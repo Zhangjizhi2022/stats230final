@@ -12,7 +12,7 @@ output:
     extra_dependencies: [bbold, bbm, float]
     toc: false
 citation_package: "natbib"
-bibliography: "My_bib.bib"
+bibliography: "Our_bib.bib"
 biblio-style: "apalike"
 link-citations: true
 urlcolor: blue
