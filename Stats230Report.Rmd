@@ -1,20 +1,24 @@
 ---
 title: |
-    | Stats 230 Final Project Report
+  | Stats 230 Final Project Report
 author: |
-    | David Mwakima and Jizhi Zhang
+  | David Mwakima and Jizhi Zhang
 date: |
-    | 03/10/2023
-classoption:
-        - twocolumn
-output: 
-   bookdown::pdf_document2:
-    extra_dependencies: [bbold, bbm, float]
-    toc: false
-citation_package: "natbib"
-bibliography: "Our_bib.bib"
-biblio-style: "apalike"
-link-citations: true
+  | 03/10/2023
+output:
+  pdf_document:
+    toc: no
+  bookdown::pdf_document2:
+    extra_dependencies:
+    - bbold
+    - bbm
+    - float
+    toc: no
+classoption: twocolumn
+citation_package: natbib
+bibliography: Our_bib.bib
+biblio-style: apalike
+link-citations: yes
 urlcolor: blue
 linkcolor: blue
 fig_caption: yes
