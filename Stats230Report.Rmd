@@ -5,25 +5,57 @@ author: |
   | David Mwakima and Jizhi Zhang
 date: |
   | 03/10/2023
-output:
-  pdf_document:
-    toc: no
-  bookdown::pdf_document2:
-    extra_dependencies:
-    - bbold
-    - bbm
-    - float
-    toc: no
-classoption: twocolumn
+fontsize: 11pt
+classoption:
+        - twocolumn
+output: 
+   bookdown::pdf_document2:
+    #   pandoc_args: [
+    #   "-V", "classoption=twocolumn"
+    # ]
+      includes:
+        # in_header: Preamble.tex 
+      toc: false
+      toc_depth: 2
+      extra_dependencies: [bbold, bbm, float]
 citation_package: natbib
-bibliography: Our_bib.bib
-biblio-style: apalike
+bibliography: ["Our_bib.bib"]
+biblio-style: "apalike"
 link-citations: yes
 urlcolor: blue
 linkcolor: blue
 fig_caption: yes
 ---
 
-## Introduction
+# Introduction
+
+What is MCMC for Bayesian inference?
+
+[Add details here]
+
+The Metropolis-Hastings algorithm developed by @Metropolis1953 is used for MCMC @Gefland1990. 
+
+The use of  MCMC for Large datasets presents a new research frontier.
+
+[Add details here]
+
+
+In our report we consider a paper by @Maire2019 that addresses the problem of using MCMC for large datasets. This paper proposes a new methodology, which the authors call \textit{Informed Sub-Sampling MCMC} (ISS-MCMC), for doing Bayesian MCMC approximation of the posterior distribution. 
+
+# Main ideas of how it works
+
+This methodology is "informed" because it makes use of a measure of similarity with respect to the full dataset through summary statistics. It is "sub-sampling" because it uses this measure to select a subset of the dataset that will be used by the Markov transition kernel at the $k$-th iteration of the algorithm. In this way, the Markov chain transition kernel uses only a fraction $n/N$ of the entire dataset. They show using examples that choosing $n \ll N$ can lead to significant reductions in computational run-times while still retaining the simplicity of the standard Metropolis-Hastings algorithm. 
+
+# Comparison with other approaches
+
+Other approaches to solve the same statistical problems are @Quiroz2018 and the \textit{Confidence Sampler} in @Bardenet2017. Both of these approaches use sophisticated "control variates" to get positive unbiased estimators (based on a subset of data) for the likelihoods in the Metropolis-Hastings acceptance ratio. The authors note that these control variates are computationally intensive.
+
+Another approach which the authors compare their approach with is an approach based on continuous time Markov processes (Zig-Zag process, Langevin diffusion) in @Fearnhead2018. Here, the authors note that the computational hurdle involves calculation of the gradient of the log-likelihood, which may not always be unbiased. Moreover, these approaches depart significantly from the simplicity of the original discrete M-H algorithm.
+
+# Example with logistic regression
+
+# References
+
+
 
 
