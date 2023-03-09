@@ -44,7 +44,7 @@ In our report we consider a paper by @Maire2019 that addresses the problem of us
 
 # Main ideas of how it works
 
-ISS-MCMC is "informed" because it makes use of a measure of similarity with respect to the full dataset through summary statistics. It is "sub-sampling" because it uses this measure to select a subset of the dataset that will be used by the Markov transition kernel at the $k$-th iteration of the algorithm. In this way, the Markov chain transition kernel uses only a fraction $n/N$ of the entire dataset. They show using examples that choosing $n \ll N$ can lead to significant reductions in computational run-times while still retaining the simplicity of the standard Metropolis-Hastings algorithm. In the following subsections we consider in more detail the main ideas of how this algorithm works.
+ISS-MCMC is "informed" because it makes use of a measure of similarity with respect to the full dataset through summary statistics. It is "sub-sampling" because it uses this measure to select a subset of the dataset that will be used by the Markov transition kernel at the $k$-th iteration of the algorithm. In this way, the Markov chain transition kernel uses only a fraction $n/N$ of the entire dataset. They show using examples that choosing $n \ll N$ can lead to significant reductions in computational run-times while still retaining the simplicity of the standard Metropolis-Hastings algorithm. In the following subsections we consider in more detail the main ideas of how this algorithm works. See section 4.
 
 ## Similarity through summary statistics
 
@@ -71,7 +71,7 @@ Another approach which the authors compare their approach with is an approach ba
 
 # Example with logistic regression
 
-Here we reproduce one example in their paper for the case of logistic regression.
+Here we reproduce one example in their paper for the case of logistic regression. See section 6.3
 
 # References
 
