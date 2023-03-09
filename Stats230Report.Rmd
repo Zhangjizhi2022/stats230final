@@ -31,16 +31,16 @@ fig_caption: yes
 
 What is MCMC for Bayesian inference?
 
-[Add details here]
+[David details here]
 
 The Metropolis-Hastings algorithm developed by @Metropolis1953 is used for MCMC @Gelfand1990. 
 
 The use of  MCMC for Large datasets presents a new research frontier.
 
-[Add details here]
+[David details here]
 
 
-In our report we consider a paper by @Maire2019 that addresses the problem of using MCMC for large datasets. This paper proposes a new methodology, which the authors call \textit{Informed Sub-Sampling MCMC} (ISS-MCMC), for doing Bayesian MCMC approximation of the posterior distribution. 
+In our report we consider a paper by @Maire2019 that addresses the problem of using MCMC for large datasets. This paper proposes a new methodology, which the authors call \textit{Informed Sub-Sampling MCMC} (ISS-MCMC), for doing Bayesian MCMC approximation of the posterior distribution. This is a scalable version of the Metropolis-Hastings algorithm designed for situations when $N$ is so big that to approximate the posterior distribution takes a very long time. 
 
 # Main ideas of how it works
 
@@ -48,16 +48,15 @@ ISS-MCMC is "informed" because it makes use of a measure of similarity with resp
 
 ## Similarity through summary statistics
 
-See @Fearnhead2012
+See @Fearnhead2012 [Jizhi add details here]
 
 ## Transition kernel
 
+[Jizhi add details here]
 
 ## The Algorithm
 
-
-## Convergence properties
-
+[Copy-paste]
 
 # Comparison with other approaches
 
@@ -72,6 +71,13 @@ Another approach which the authors compare their approach with is an approach ba
 # Example with logistic regression
 
 Here we reproduce one example in their paper for the case of logistic regression. See section 6.3
+
+[Meet to code example next week]
+
+
+## Compare convergence of ISS-MCMC with M-H.
+
+[Add after coding example]
 
 # References
 
