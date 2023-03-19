@@ -7,11 +7,22 @@ N = length(y)
 iter <- 100
 U <- matrix(NA, nrow=N, ncol=iter)
 U[, 1] <- c(rep(0, 400), rep(1, 100))
+which(U[, 1] == 1)
+U[,2][which(U[, 1] == 1)] <- 1
+
 for (i in 1:iter){
   
   set.seed(i)
   U.prop <-sample(1:500,100,replace = FALSE)
+  y.cur <- y[which(U[, 1] == 1)]
   y.prop <- y[U.prop]
   n <- length(U.prop)
   delta_n.prop <- sum(y) - N/n*sum(y.prop)
   delta_n <- sum(y)- N/n*sum(y.cur)
+  b <- exp(epislon(delta_n^2-delta_n.prop^2))
+  beta <- min(1,b)
+  U[,i+1] <- rep(0,500)
+  if (runif(1)<beta){
+    U[,i+i][U.prop] <- 1
+  }
+  else U[,i+i] <- U[,i]
