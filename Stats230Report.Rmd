@@ -29,20 +29,18 @@ fig_caption: yes
 
 # Introduction
 
-Markov Chain Monte Carlo (MCMC) is a numerical integration technique. The main motivation for this technique is that it is often not feasible both mathematically and practically to evaluate certain integrals in high dimensions. In Bayesian statistics, in particular, since all inference proceeds via the posterior distribution $p(\theta| \textbf{X})$ where $\theta$ could be a vector of multiple parameters, we need some way of finding this posterior; especially in cases where it is not available in closed analytic form. We know that:
+Markov Chain Monte Carlo (MCMC) is a numerical integration technique. The main motivation for this technique is that it is often not feasible both mathematically and practically to evaluate certain integrals in high dimensions. In Bayesian statistics, in particular, all inference proceeds via the posterior distribution $p(\theta| \textbf{X})$ where $\theta$ could be a vector of multiple parameters. This distribution is given by
 \[
 p(\theta | \textbf{X}) = \frac{1}{C} f(\textbf{X}|\theta)p(\theta)
 \]
-where $f(\textbf{X}|\theta)$ is our sampling model for $\textbf{X}$, $p(\theta)$ is our prior model for $\theta$ and $C = \int_{\Theta} f(\textbf{X}|\theta) p(\theta)$ is the normalizing constant.
+where $f(\textbf{X}|\theta)$ is our sampling model for $\textbf{X}$, $p(\theta)$ is our prior model for $\theta$ and $C = \int_{\Theta} f(\textbf{X}|\theta) p(\theta)$ is the normalizing constant. But computing C requires integration if we are going to evaluate this posterior and use it for inference. This is difficult, especially in cases where it is not available in closed analytic form. 
 
-@Gelfand1990 rediscovered the Metropolis-Rosenbluth-Hastings algorithm developed by @Metropolis1953. This algorithm relies on the theory of Markov stochastic processes. Assuming certain conditions (irreducibility, positive recurrence, detailed balance) are satisfied by a homogeneous Markov chain $\{X_{n} \}$ on state space $E$, then one can show that the chain possesses a stationary distribution $\bf{\pi}$. One then appeals to the Ergodic Theorem (a dependent samples analogue of the Strong Law of Large Numbers for i.i.d samples) that guarantees that for any initial distribution:
+Since @Gelfand1990 rediscovered the Metropolis-Rosenbluth-Hastings (MRH) algorithm developed by @Metropolis1953, this difficulty has been addressed. This algorithm relies on the theory of Markov stochastic processes. Assuming certain conditions (irreducibility, positive recurrence, detailed balance) are satisfied by a homogeneous Markov chain $\{X_{n} \}$ on state space $E$, then one can show that the chain possesses a stationary distribution $\bf{\pi}$. One then appeals to the Ergodic Theorem (a dependent samples analogue of the Strong Law of Large Numbers for i.i.d samples) that guarantees that for any initial distribution:
 \[
 \lim_{N \to \infty}\frac{1}{N}\sum_{k = 1}^{N}f(X_{k}) = \sum_{i \in E}f(i)\pi_{i} = E_{\pi}\big[f(X)\big]
 \]
 
-Let $p(\theta | \bf{X})$ be the target distribution, where $\bf{\theta}$ is a vector of parameters. Then with proposal densities $q(\theta^{(j)} | \theta^{(i)}, \bf{X})$, the Metropolis-Rosenbluth-Hastings acceptance ratio is:
-
-\[
+Let $p(\theta | \bf{X})$ be the target distribution, where $\bf{\theta}$ is a vector of parameters. Then with proposal densities $q(\theta^{(j)} | \theta^{(i)}, \bf{X})$, the MRH acceptance ratio is:\[
 a(\theta^{(j)}, \theta^{(i)}, \textbf{X}) = \text{min}\bigg\{\frac{p(\theta^{(j)} | \textbf{X})}{p(\theta^{(i)} | \textbf{X})} \frac{q(\theta^{(i)} | \theta^{(j)}, \textbf{X})}{q(\theta^{(j)} | \theta^{(i)}, \textbf{X})}, 1\bigg\}
 \]
 
@@ -64,10 +62,11 @@ And the Metropolis-Rosenbluth-Hastings Algorithm (MRH) for approximating $E_{p(\
 \hline
 \end{tabular}
 
-The use of MCMC for large datasets presents a new research frontier (@Bardenet2017). As a consequence MCMC with the MRH algorithm cannot bee considered for reasonable runtime.
-
-[David details here]
-
+However, the use of MCMC for large datasets presents a new research frontier, see @Bardenet2014 and @Bardenet2017. This is because when \textbf{X} is large $n \gg 1$ as is typically the case in genomics, spatial statistics and cosmology, evaluating the likelihood ratio appearing in the MRH acceptance ratio is computationally intensive $O(n^{3})$.
+\[
+\frac{p(\theta^{(j)} | \textbf{X})}{p(\theta^{(i)} | \textbf{X})} = \frac{p(\theta^{(j)})}{p(\theta^{(i)})}\frac{\prod_{k=1}^{n}f(X_{k}|\theta^{(j)})}{\prod_{k=1}^{n}f(X_{k}|\theta^{(i)})}
+\]
+As a consequence MCMC with the MRH algorithm cannot be considered for reasonable runtime. 
 
 In our report we consider a paper by @Maire2019 that addresses the problem of using MCMC for large datasets. This paper proposes a new methodology, which the authors call \textit{Informed Sub-Sampling MCMC} (ISS-MCMC), for doing Bayesian MCMC approximation of the posterior distribution. This is a scalable version of the Metropolis-Hastings algorithm designed for situations when $N$ is so big that to approximate the posterior distribution takes a very long time. 
 
@@ -77,7 +76,9 @@ ISS-MCMC is "informed" because it makes use of a measure of similarity with resp
 
 ## Similarity through summary statistics
 
-See @Fearnhead2012 [Jizhi add details here]
+See @Fearnhead2012 
+
+[Jizhi add details here]
 
 ## Transition kernel
 
