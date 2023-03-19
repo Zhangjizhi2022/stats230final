@@ -9,8 +9,8 @@ n <- 100
 epsilon <- 0.005
 iter <- 100
 U <- matrix(NA, nrow=N, ncol=iter+1)
-theta <- matrix(NA, nrow=d, ncol=iter+1)
-theta[, 1] <- c(rep(0.5, d))
+betas <- matrix(NA, nrow=d, ncol=iter+1)
+betas[, 1] <- c(rep(0.5, d))
 U[, 1] <- c(rep(0, 400), rep(1, 100))
 for (i in 1:iter){
   set.seed(i)
