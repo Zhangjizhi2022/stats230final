@@ -98,6 +98,8 @@ The noisy approaches due to @Korattikara2014 and @Alquier2016
 
 Another approach which the authors compare their approach with is an approach based on continuous time Markov processes (Langevin diffusion, Zig-Zag process) in @Fearnhead2018 and @Bierkens2019. Here, the authors note that the computational hurdle involves calculation of the gradient of the log-likelihood, which may not always be unbiased. Moreover, these approaches depart significantly from the simplicity of the original discrete M-H algorithm.
 
+[David add details]
+
 # Example with logistic regression
 
 Here we reproduce one example in their paper for the case of logistic regression. See section 6.3
