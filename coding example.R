@@ -4,22 +4,19 @@ sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
 sim<-mvrnorm(500,mean,sigma)
 y=rbinom(500,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
 N = length(y)
+n <- 100
+epsilon <- 0.005
 iter <- 100
 U <- matrix(NA, nrow=N, ncol=iter)
 U[, 1] <- c(rep(0, 400), rep(1, 100))
-which(U[, 1] == 1)
-U[,2][which(U[, 1] == 1)] <- 1
-
 for (i in 1:iter){
-  
   set.seed(i)
-  U.prop <-sample(1:500,100,replace = FALSE)
+  U.prop <-sample(1:500, n, replace = FALSE)
   y.cur <- y[which(U[, 1] == 1)]
   y.prop <- y[U.prop]
-  n <- length(U.prop)
   delta_n.prop <- sum(y) - N/n*sum(y.prop)
   delta_n <- sum(y)- N/n*sum(y.cur)
-  b <- exp(epislon(delta_n^2-delta_n.prop^2))
+  b <- exp(epislon*(delta_n^2-delta_n.prop^2))
   beta <- min(1,b)
   U[,i+1] <- rep(0,500)
   if (runif(1)<beta){
