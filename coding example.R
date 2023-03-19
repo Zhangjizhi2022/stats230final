@@ -9,7 +9,8 @@ U <- matrix(NA, nrow=N, ncol=iter)
 for (i in 1:iter){
   
   set.seed(i)
-  U <- sample(y, 100)
-  n <- length(U)
-
-delta_n <- sum(y) - N/n*sum(U)
+  U.prop <-sample(1:500,100,replace = FALSE)
+  y.prop <- y[U.prop]
+  n <- length(U.prop)
+  delta_n.prop <- sum(y) - N/n*sum(y.prop)
+  delta_n <- sum(y)- N/n*sum(y.cur)
