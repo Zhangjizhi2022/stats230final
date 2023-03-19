@@ -1,0 +1,5 @@
+set.seed(17)
+mean<-c(1,1)
+sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
+sim<-mvrnorm(500,mean,sigma)
+y=rbinom(500,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
