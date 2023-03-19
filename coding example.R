@@ -6,6 +6,7 @@ y=rbinom(500,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
 N = length(y)
 iter <- 100
 U <- matrix(NA, nrow=N, ncol=iter)
+U[, 1] <- c(rep(0, 400), rep(1, 100))
 for (i in 1:iter){
   
   set.seed(i)
