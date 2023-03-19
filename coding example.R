@@ -7,7 +7,7 @@ N = length(y)
 n <- 100
 epsilon <- 0.005
 iter <- 100
-U <- matrix(NA, nrow=N, ncol=iter)
+U <- matrix(NA, nrow=N, ncol=iter+1)
 U[, 1] <- c(rep(0, 400), rep(1, 100))
 for (i in 1:iter){
   set.seed(i)
@@ -20,6 +20,6 @@ for (i in 1:iter){
   beta <- min(1,b)
   U[,i+1] <- rep(0,500)
   if (runif(1)<beta){
-    U[,i+i][U.prop] <- 1
+    U[,i+1][U.prop] <- 1
   }
-  else U[,i+i] <- U[,i]
+  else U[,i+1] <- U[,i]
