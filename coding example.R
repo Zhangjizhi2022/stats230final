@@ -6,9 +6,9 @@ y=rbinom(500,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
 N = length(y)
 d = 3
 n <- 100
-delta <- 0.2
+delta <- 0.1
 epsilon <- 0.005
-iter <- 100
+iter <- 1000
 U <- matrix(NA, nrow=N, ncol=iter+1)
 betas <- matrix(NA, nrow=d, ncol=iter+1)
 betas[, 1] <- c(rep(0.5, d))
@@ -20,7 +20,7 @@ for (i in 1:iter){
   y.prop <- y[U.prop]
   delta_n.prop <- sum(y) - N/n*sum(y.prop)
   delta_n <- sum(y)- N/n*sum(y.cur)
-  b <- exp(epislon*(delta_n^2-delta_n.prop^2))
+  b <- exp(epsilon*(delta_n^2-delta_n.prop^2))
   beta <- min(1,b)
   U[,i+1] <- rep(0,500)
   if (runif(1)<beta){
@@ -44,7 +44,7 @@ for (i in 1:iter){
 }
 
   
-  
+ mean(betas[3,]) 
   
   
   
