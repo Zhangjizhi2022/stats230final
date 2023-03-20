@@ -1,20 +1,31 @@
 set.seed(17)
+
+##Simulated Data
 mean<-c(1,1)
 sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
 N = 10000
 sim<-mvrnorm(N,mean,sigma)
 y=rbinom(N,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
 
+##Function Arguments and Tuning Parameters
 d = 3
 n <- 1000
 delta <- 0.1
 epsilon <- 0.005
 iter <- 10000
+
+
+ISS_MCMC_logistic <- function(N, n, d, delta, epsilon, iter)
+{
+  #storing subsamples and output
 U <- matrix(NA, nrow=N, ncol=iter+1)
 betas <- matrix(NA, nrow=d, ncol=iter+1)
+
+  #initializing
 betas[, 1] <- c(rep(0.5, d))
 U[, 1] <- c(rep(0, N-n), rep(1, n))
 
+  #likelihood function
 loglike <- function(beta, x, y) {
   eta <- x %*% beta
   loglike <- sum(y * eta - log(1 + exp(eta)))
@@ -26,7 +37,6 @@ prior <- function(beta) {
   prior <- dnorm(beta, 0, 10, log = TRUE)
   return(prior)
 }
-
 
 for (i in 1:iter){
   set.seed(i)
@@ -56,13 +66,13 @@ for (i in 1:iter){
   }
   else betas[,i+1] <- betas[,i]
 }
-
-  
+return(betas, U)
+}
  plot(density(betas[1,]),type = 'l') 
  result1<- betas 
  ##result1: n=1000, epsilon=0.005
   
-  
+MH_MCMC_logistic <- function(x, delta){
  for (i in 1:iter){
    betas.prop <- rep(0,3)
    betas.prop[1] <- betas[1,i]+runif(1,min = -delta, max = delta)
@@ -79,6 +89,8 @@ for (i in 1:iter){
    }
    else betas[,i+1] <- betas[,i]
  }  
+  return(betas)
+}
   
   result2 <- betas
   ##result2: MH
