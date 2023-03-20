@@ -127,6 +127,35 @@ For any $\theta \in \Theta$ and $\epsilon \> 0$, there exists $M < \infty$ such 
 
 [Jizhi add details here Section 4.2.2]
 
+In the Informed Sub-Sampling method, the set of good subsamples is treated as a series of missing data (denoted by $U_{1}$, $U_{2}$, and so on) and is simulated using the ISS-MCMC algorithm. This algorithm generates a Markov chain on the extended space 
+$\theta \times  \mathcal{U}_{n}$, where $\mathcal{U}_{n}$ is the set of possible subsamples. The sequence of subsamples is randomly updated in a way that favors those subsets with summary statistics that are similar to the full dataset, as suggested by the analysis in previous sections. The process is implemented using a symmetric transition kernel R on $(\mathcal{U}_n, U_n)$. A transition from $(\theta_i,U_i)$ to $(\theta_{I+1} , U_{i+1})$ involves two steps:
+
+(i)
+
+(a) Propose a new subset variable $U \sim R(U_i, \cdot)$
+
+(b) Set $U_{i+1}=U$ with probability 
+\begin{equation}
+\beta(U_i, U)=1 \wedge b(U_i, U)
+\end{equation}
+, where 
+\begin{equation}
+b(U_i, U) = \exp \left( \epsilon(|\Delta_n(U_i)|^2 - |\Delta_n(U)|^2) \right)
+\end{equation}, and $U_{i+1} = U_i$ with probability $1 - \beta(U_i, U)$. Here, $\Delta_n$ is defined in equation 2. The transition kernel R is selected based on the data and distribution.
+
+(ii)
+
+(a)propose a new parameter $\theta \sim Q(\theta_i, \cdot)$
+
+(b)Set $\theta_{i+1}=\theta$ with probability 
+\begin{equation}
+\alpha(\theta_i, \theta)=1 \wedge a(\theta_i, \theta)
+\end{equation}
+, where 
+\begin{equation}
+a(\theta_i, \theta) =  \frac{\pi_n(\theta \mid Y_{U_{i+1}})Q(\theta, \theta_i)} {\pi_n(\theta_i \mid Y_{U_{i+1}})Q(\theta_i, \theta)}
+\end{equation}, and $\theta_{i+1} = \theta_i$ with probability $1 - \alpha(U_i, U)$. The transition kernel Q is selected based on the data and distribution.
+
 ## The Algorithm
 
 [David to type out the table here]
@@ -134,6 +163,12 @@ For any $\theta \in \Theta$ and $\epsilon \> 0$, there exists $M < \infty$ such 
 # Example with logistic regression
 
 Here we implement one example from their paper. The example involves simulated logistic regression data with $N= 10^6$ observations and $n = 1000, 5000$ and $1000$
+
+Consider the logistic regression model:
+\begin{equation}
+P(Y=1) = \frac{\exp(\beta_0 + \beta_1X_1 + \beta_2X_2)}{1+\exp(\beta_0 + \beta_1X_1 + \beta_2X_2)}
+\end{equation},
+
 
 [Jizhi and David section 6.3]
 

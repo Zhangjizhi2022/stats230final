@@ -1,5 +1,6 @@
 
 ##Simulated Data
+library(MASS)
 set.seed(17)
 mean<-c(1,1)
 sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
@@ -114,7 +115,7 @@ MRH_MCMC_logistic <- function(sim,y, d, delta){
 }
 
 system.time({MRH_MCMC_logistic(sim,y, d, delta)})
-system.time({ISS_MCMC_logistic(sim, y, n, d, delta, epsilon, iter)})
+system.time({ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon, iter)})
 
 
 ##Benchmarking
