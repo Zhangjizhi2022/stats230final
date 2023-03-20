@@ -12,17 +12,15 @@
 #' @export
 #'
 #' @examples 
-#' Simulated Data
+#' ##Simulated Data
+#' set.seed(17)
 #' mean<-c(1,1)
 #' sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
-#' sim<-mvrnorm(N,mean,sigma)
-#' y=rbinom(N,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
 #' N = 10000
-#' n = 1000
 #' d = 3
 #' epsilon = 0.005
-#' delta = 0.2
-#' iter = 1000
+#' sim<-mvrnorm(N,mean,sigma)
+#' y=rbinom(N,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
 
 
 ISS_MCMC_logistic <- function(sim, y, n, d, delta, epsilon, iter)
@@ -76,5 +74,5 @@ ISS_MCMC_logistic <- function(sim, y, n, d, delta, epsilon, iter)
     }
     else betas[,i+1] <- betas[,i]
   }
-  return(list(betas, U))
+  return(betas, U)
 }

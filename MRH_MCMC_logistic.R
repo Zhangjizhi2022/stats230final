@@ -12,10 +12,12 @@
 #' mean<-c(1,1)
 #' sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
 #' N = 10000
+#' d = 3
+#' delta = 0.2
 #' sim<-mvrnorm(N,mean,sigma)
 #' y=rbinom(N,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
 
-MRH_MCMC_logistic <- function(sim,y,d, delta){
+MRH_MCMC_logistic <- function(sim,y, d, delta){
   for (i in 1:iter){
     #allocate space to store output
     betas <- matrix(NA, nrow=d, ncol=iter+1)
