@@ -71,10 +71,6 @@ for (i in 1:iter){
    log_ratio <- loglike(betas.prop, x.cur, y.cur) + prior(betas.prop) -
      loglike(betas[,i], x.cur, y.cur) - prior(betas[,i])
    ratio <- mean(exp(log_ratio))
-   #p.cur <- mean(plogis(betas[1,i]+betas[2,i]*sim[which(U[, i+1] == 1),1]+betas[3,i]*sim[which(U[, i+1] == 1),2]))
-   #p.prop <- mean(plogis(betas.prop[1]+betas.prop[2]*sim[which(U[, i+1] == 1),1]+betas.prop[3]*sim[which(U[, i+1] == 1),2]))
-   #a <- p.prop^sum(y.cur)*(1-p.prop)^(n-sum(y.cur))/(p.cur^sum(y.cur)*(1-p.cur)^(n-sum(y.cur)))
-   #alpha <- min(1,a)
    betas[,i+1] <- rep(0,3)
    if (runif(1) < ratio){
      betas[,i+1] <- betas.prop
