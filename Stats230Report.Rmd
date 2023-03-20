@@ -62,10 +62,11 @@ And the MRH algorithm, in pseudo-code, for approximating $E_{p(\theta | \textbf{
 \hline
 \end{tabular}
 
-However, the use of MCMC for large datasets presents a new research frontier (@Bardenet2014 and @Bardenet2017). This is because when \textbf{X} is large $n \gg 1$, as is typically the case in genomics, spatial statistics and cosmology; evaluating the likelihood ratio appearing in the MRH acceptance ratio is computationally intensive $O(2n^{2})$ (@Bardenet2014).
+However, the use of MCMC for large datasets presents a new research frontier (@Bardenet2014 and @Bardenet2017). This is because when \textbf{X} is large $n \gg 1$, as is typically the case in genomics, spatial statistics and cosmology; evaluating the likelihood ratio
 \[
 \frac{p(\theta^{(j)} | \textbf{X})}{p(\theta^{(i)} | \textbf{X})} = \frac{p(\theta^{(j)})}{p(\theta^{(i)})}\frac{\prod_{k=1}^{n}f(X_{k}|\theta^{(j)})}{\prod_{k=1}^{n}f(X_{k}|\theta^{(i)})}
-\]
+\] appearing in the MRH acceptance ratio is computationally intensive (@Bardenet2014).
+
 As a consequence MCMC with the MRH algorithm cannot be considered for reasonable runtime when $n$ is very large. 
 
 In our report we consider a paper by @Maire2019 that addresses the problem of using MCMC for large datasets. This paper proposes a new methodology, which the authors call \textit{Informed Sub-Sampling MCMC} (ISS-MCMC), for doing Bayesian MCMC approximation of the posterior distribution. This is a scalable version of the Metropolis-Hastings algorithm designed for situations when $n$ is so big that to approximate the posterior distribution takes a very long time. ISS-MCMC is "informed" because it makes use of a measure of similarity with respect to the full dataset through summary statistics. It is "sub-sampling" because it uses this measure to select a subset of the dataset that will be used by the Markov transition kernel at the $k$-th iteration of the algorithm. In this way, the Markov chain transition kernel uses only a fraction $n/N$ of the entire dataset. They show using examples that choosing $n \ll N$ can lead to significant reductions in computational run-times while still retaining the simplicity of the standard Metropolis-Hastings algorithm. Moreover, unlike other approaches (discussed below), their method can be applied to virtually any model (involving i.i.d. data or not) and it does not require any assumption on the likelihood function nor on the prior distribution.
@@ -132,7 +133,7 @@ For any $\theta \in \Theta$ and $\epsilon \> 0$, there exists $M < \infty$ such 
 
 # Example with logistic regression
 
-Here we implement one example from their paper. The example involves simulated logistic regression data with $N= 10^6$ observations and $n = 1000, 5000 and 1000$
+Here we implement one example from their paper. The example involves simulated logistic regression data with $N= 10^6$ observations and $n = 1000, 5000$ and $1000$
 
 [Jizhi and David section 6.3]
 
