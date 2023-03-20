@@ -67,7 +67,7 @@ ISS_MCMC_logistic <- function(sim, y, n, d, delta, epsilon, iter)
     }
     else betas[,i+1] <- betas[,i]
   }
-  return(list(betas, U))
+  return(list(betas=betas, U=U))
 }
 
 ## MRH_MCMC_logistic function

@@ -14,8 +14,7 @@ epsilon <- 0.005
 iter <- 10000
 
 
-ISS_MCMC_logistic <- function(N, n, d, delta, epsilon, iter)
-{
+
   #storing subsamples and output
 U <- matrix(NA, nrow=N, ncol=iter+1)
 betas <- matrix(NA, nrow=d, ncol=iter+1)
@@ -65,8 +64,7 @@ for (i in 1:iter){
   }
   else betas[,i+1] <- betas[,i]
 }
-return(betas, U)
-}
+
  plot(density(betas[1,]),type = 'l') 
  result1<- betas 
  ##result1: n=1000, epsilon=0.005
@@ -94,7 +92,7 @@ MH_MCMC_logistic <- function(x, delta){
   result2 <- betas
   ##result2: MH
   
-  n<-5000
+  n<-1000
   for (i in 1:iter){
     set.seed(i)
     U.prop <-sample(1:500, n, replace = FALSE)
@@ -129,6 +127,9 @@ MH_MCMC_logistic <- function(x, delta){
   result3<- betas 
   ##result3: n=5000, epsilon=0.005
   plot(betas[1,],type = 'l')
+  
+  
+
   
   
   
