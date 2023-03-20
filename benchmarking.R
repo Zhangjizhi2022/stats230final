@@ -72,8 +72,9 @@ ISS_MCMC_logistic <- function(sim, y, n, d, delta, epsilon, iter)
 
 ## MRH_MCMC_logistic function
 
-MRH_MCMC_logistic <- function(sim,y,d, delta){
-  for (i in 1:iter){
+
+MRH_MCMC_logistic <- function(sim,y, d, delta){
+  
     #allocate space to store output
     betas <- matrix(NA, nrow=d, ncol=iter+1)
     
@@ -81,6 +82,7 @@ MRH_MCMC_logistic <- function(sim,y,d, delta){
     betas[, 1] <- c(rep(0.5, d))
     
     #running the MRH algorithm
+    for (i in 1:iter){
     betas.prop <- rep(0,3)
     betas.prop[1] <- betas[1,i]+runif(1,min = -delta, max = delta)
     betas.prop[2] <- betas[2,i]+runif(1,min = -delta, max = delta)
@@ -99,7 +101,8 @@ MRH_MCMC_logistic <- function(sim,y,d, delta){
   return(betas)
 }
 
-
+system.time({MRH_MCMC_logistic(sim,y, d, delta)})
+system.time({ISS_MCMC_logistic(sim, y, n, d, delta, epsilon, iter)})
 
 
 ##Benchmarking
