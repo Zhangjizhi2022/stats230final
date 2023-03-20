@@ -6,6 +6,7 @@ y=rbinom(500,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
 N = length(y)
 d = 3
 n <- 100
+delta <- 0.2
 epsilon <- 0.005
 iter <- 100
 U <- matrix(NA, nrow=N, ncol=iter+1)
@@ -26,11 +27,20 @@ for (i in 1:iter){
     U[,i+1][U.prop] <- 1
   }
   else U[,i+1] <- U[,i]
-  
+  betas.prop <- rep(0,3)
+  betas.prop[1] <- betas[1,i]+runif(1,min = -delta, max = delta)
+  betas.prop[2] <- betas[2,i]+runif(1,min = -delta, max = delta)
+  betas.prop[3] <- betas[3,i]+runif(1,min = -delta, max = delta)
   y.cur <- y[which(U[, i+1] == 1)]
   p.cur <- mean(plogis(betas[1,i]+betas[2,i]*sim[which(U[, i+1] == 1),1]+betas[3,i]*sim[which(U[, i+1] == 1),2]))
   p.prop <- mean(plogis(betas.prop[1]+betas.prop[2]*sim[which(U[, i+1] == 1),1]+betas.prop[3]*sim[which(U[, i+1] == 1),2]))
   a <- p.prop^sum(y.cur)*(1-p.prop)^(n-sum(y.cur))/(p.cur^sum(y.cur)*(1-p.cur)^(n-sum(y.cur)))
+  alpha <- min(1,a)
+  betas[,i+1] <- rep(0,3)
+  if (runif(1)<alpha){
+    betas[,i+1] <- betas.prop
+  }
+  else betas[,i+1] <- betas[,i]
 }
 
   
