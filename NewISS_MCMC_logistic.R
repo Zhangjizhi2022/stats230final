@@ -20,7 +20,7 @@
 #' y=rbinom(N,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
 
 
-ISS_MCMC_logistic <- function(N, n, d, delta, epsilon, iter)
+ISS_MCMC_logistic <- function(sim,y,N, n, d, delta, epsilon, iter)
 {
   #storing subsamples and output
   U <- matrix(NA, nrow=N, ncol=iter+1)

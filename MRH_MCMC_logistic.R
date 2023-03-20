@@ -15,7 +15,7 @@
 #' sim<-mvrnorm(N,mean,sigma)
 #' y=rbinom(N,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
 
-MRH_MCMC_logistic <- function(d, delta){
+MRH_MCMC_logistic <- function(sim,y,d, delta){
   for (i in 1:iter){
     #allocate space to store output
     betas <- matrix(NA, nrow=d, ncol=iter+1)
