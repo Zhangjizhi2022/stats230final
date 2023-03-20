@@ -4,7 +4,7 @@ title: |
 author: |
   | David Mwakima and Jizhi Zhang
 date: |
-  | 03/10/2023
+  | 03/20/2023
 fontsize: 11pt
 classoption:
         - twocolumn
@@ -33,18 +33,18 @@ Markov Chain Monte Carlo (MCMC) is a numerical integration technique. The main m
 \[
 p(\theta | \textbf{X}) = \frac{1}{C} f(\textbf{X}|\theta)p(\theta)
 \]
-where $f(\textbf{X}|\theta)$ is our sampling model for $\textbf{X}$, $p(\theta)$ is our prior model for $\theta$ and $C = \int_{\Theta} f(\textbf{X}|\theta) p(\theta)$ is the normalizing constant. But computing C requires integration if we are going to evaluate this posterior and use it for inference. This is difficult, especially in cases where it is not available in closed analytic form. 
+where $f(\textbf{X}|\theta)$ is our sampling model for $\textbf{X}$, $p(\theta)$ is our prior model for $\theta$ and $C = \int_{\Theta} f(\textbf{X}|\theta) p(\theta)$ is the normalizing constant. But computing C requires integration if we are going to evaluate this posterior and use it for inference. This is difficult, especially in cases where: (1) an expression for the integrand is not available in closed analytic form and (2) high dimensional models with 5 or more parameters.
 
-Since @Gelfand1990 rediscovered the Metropolis-Rosenbluth-Hastings (MRH) algorithm developed by @Metropolis1953, this difficulty has been addressed. This algorithm relies on the theory of Markov stochastic processes. Assuming certain conditions (irreducibility, positive recurrence, detailed balance) are satisfied by a homogeneous Markov chain $\{X_{n} \}$ on state space $E$, then one can show that the chain possesses a stationary distribution $\bf{\pi}$. One then appeals to the Ergodic Theorem (a dependent samples analogue of the Strong Law of Large Numbers for i.i.d samples) that guarantees that for any initial distribution:
+Since @Gelfand1990 rediscovered the Metropolis-Rosenbluth-Hastings (MRH) algorithm developed by @Metropolis1953, this difficulty in Bayesian analysis has been addressed. This algorithm relies on the theory of Markov stochastic processes. Assuming certain conditions (irreducibility, positive recurrence, detailed balance) are satisfied by a homogeneous Markov chain $\{X_{n} \}$ on state space $E$, then one can show that the chain possesses a stationary distribution $\bf{\pi}$. One then appeals to the Ergodic Theorem (a dependent samples analogue of the Strong Law of Large Numbers for i.i.d samples) that guarantees that for any initial distribution:
 \[
 \lim_{N \to \infty}\frac{1}{N}\sum_{k = 1}^{N}f(X_{k}) = \sum_{i \in E}f(i)\pi_{i} = E_{\pi}\big[f(X)\big]
 \]
 
-Let $p(\theta | \bf{X})$ be the target distribution, where $\bf{\theta}$ is a vector of parameters. Then with proposal densities $q(\theta^{(j)} | \theta^{(i)}, \bf{X})$, the MRH acceptance ratio is:\[
+Here's how the algorithm works for Bayesian inference. Let $p(\theta | \bf{X})$ be the target distribution, where $\bf{\theta}$ is a vector of parameters. Then with proposal densities $q(\theta^{(j)} | \theta^{(i)}, \bf{X})$, the MRH acceptance ratio is:\[
 a(\theta^{(j)}, \theta^{(i)}, \textbf{X}) = \text{min}\bigg\{\frac{p(\theta^{(j)} | \textbf{X})}{p(\theta^{(i)} | \textbf{X})} \frac{q(\theta^{(i)} | \theta^{(j)}, \textbf{X})}{q(\theta^{(j)} | \theta^{(i)}, \textbf{X})}, 1\bigg\}
 \]
 
-And the Metropolis-Rosenbluth-Hastings Algorithm (MRH) for approximating $E_{p(\theta | \textbf{X})}[h(\textbf{X})]$ is:
+And the MRH algorithm, in pseudo-code, for approximating $E_{p(\theta | \textbf{X})}[h(\textbf{X})]$ is:
 
 \begin{tabular}{l  l}
 \hline
@@ -62,61 +62,107 @@ And the Metropolis-Rosenbluth-Hastings Algorithm (MRH) for approximating $E_{p(\
 \hline
 \end{tabular}
 
-However, the use of MCMC for large datasets presents a new research frontier, see @Bardenet2014 and @Bardenet2017. This is because when \textbf{X} is large $n \gg 1$ as is typically the case in genomics, spatial statistics and cosmology, evaluating the likelihood ratio appearing in the MRH acceptance ratio is computationally intensive $O(n^{3})$.
+However, the use of MCMC for large datasets presents a new research frontier (@Bardenet2014 and @Bardenet2017). This is because when \textbf{X} is large $n \gg 1$, as is typically the case in genomics, spatial statistics and cosmology; evaluating the likelihood ratio appearing in the MRH acceptance ratio is computationally intensive $O(2n^{2})$ (@Bardenet2014).
 \[
 \frac{p(\theta^{(j)} | \textbf{X})}{p(\theta^{(i)} | \textbf{X})} = \frac{p(\theta^{(j)})}{p(\theta^{(i)})}\frac{\prod_{k=1}^{n}f(X_{k}|\theta^{(j)})}{\prod_{k=1}^{n}f(X_{k}|\theta^{(i)})}
 \]
-As a consequence MCMC with the MRH algorithm cannot be considered for reasonable runtime. 
+As a consequence MCMC with the MRH algorithm cannot be considered for reasonable runtime when $n$ is very large. 
 
-In our report we consider a paper by @Maire2019 that addresses the problem of using MCMC for large datasets. This paper proposes a new methodology, which the authors call \textit{Informed Sub-Sampling MCMC} (ISS-MCMC), for doing Bayesian MCMC approximation of the posterior distribution. This is a scalable version of the Metropolis-Hastings algorithm designed for situations when $N$ is so big that to approximate the posterior distribution takes a very long time. 
+In our report we consider a paper by @Maire2019 that addresses the problem of using MCMC for large datasets. This paper proposes a new methodology, which the authors call \textit{Informed Sub-Sampling MCMC} (ISS-MCMC), for doing Bayesian MCMC approximation of the posterior distribution. This is a scalable version of the Metropolis-Hastings algorithm designed for situations when $n$ is so big that to approximate the posterior distribution takes a very long time. ISS-MCMC is "informed" because it makes use of a measure of similarity with respect to the full dataset through summary statistics. It is "sub-sampling" because it uses this measure to select a subset of the dataset that will be used by the Markov transition kernel at the $k$-th iteration of the algorithm. In this way, the Markov chain transition kernel uses only a fraction $n/N$ of the entire dataset. They show using examples that choosing $n \ll N$ can lead to significant reductions in computational run-times while still retaining the simplicity of the standard Metropolis-Hastings algorithm. Moreover, unlike other approaches (discussed below), their method can be applied to virtually any model (involving i.i.d. data or not) and it does not require any assumption on the likelihood function nor on the prior distribution.
 
 # Comparison with other approaches
 
-Other similar approaches to solve the same statistical problems are @Quiroz2018 and the \textit{Confidence Sampler} in @Bardenet2017. Both of these approaches use sophisticated "control variates" to get positive unbiased estimators (based on a subset of data) for the likelihoods in the Metropolis-Hastings acceptance ratio. The authors note that these control variates are computationally intensive.
+The authors note that sub-sampling of the full dataset strategy has been proposed elsewhere, in particular, by @Korattikara2014, @Bardenet2014 and  @Maclaurin2015. The key difference between their approach and these is that the Markov chain transition kernel only uses a fraction $n/N$ of the available data which is by construction held constant throughout the algorithm. It is the subset variable that is randomly refreshed at each iteration according to the similarity measure.
 
-The noisy approaches due to @Korattikara2014 and @Alquier2016
+Other similar approaches to solve these big data problems are @Quiroz2018 and the \textit{Confidence Sampler} in @Bardenet2017. Both of these approaches use sophisticated "control variates" to get positive unbiased estimators (based on a subset of data) for the likelihoods in the MRH acceptance ratio. The authors note that these control variates are still computationally intensive.
 
-@Maclaurin2015 also addresses the computational issue are independent.
+The authors also find some affinity to their work in \textit{"noisy"} or \textit{"inexact"} approaches to MCMC due to @Korattikara2014 and @Alquier2016, where an approximate MRH rule based on a sequential hypothesis test is used accept or reject samples with high confidence using only a fraction of the data required for the exact MH rule. The cost here is that the number of likelihood evaluations is adaptively set by the algorithm at each iteration. When the chain reaches equilibrium, the computational complexity is of order $O(n)$. This number can be brought down if an accurate proxy of the log-likelihood ratio, acting as control variates, is available, as demonstrated in @Bardenet2017.
 
-Another approach which the authors compare their approach with is an approach based on continuous time Markov processes (Langevin diffusion, Zig-Zag process) in @Fearnhead2018 and @Bierkens2019. Here, the authors note that the computational hurdle involves calculation of the gradient of the log-likelihood, which may not always be unbiased. Moreover, these approaches depart significantly from the simplicity of the original discrete M-H algorithm.
-
-[David add details]
-
+Another approach which the authors compare their approach with is an approach based on continuous time Markov processes (Langevin diffusion, Zig-Zag process) in @Fearnhead2018 and @Bierkens2019. Here, the authors note that the computational hurdle involves calculation of the gradient of the log-likelihood, which may not always be unbiased. Moreover, these approaches depart significantly from the simplicity of the original discrete MRH algorithm.In the following sections we consider in more detail the main ideas of how this algorithm works (Section 3) and implement one of their examples of estimating the parameters in a logistic regression model with $N = 10^{6}$ using their algorithm.
 
 # Main ideas of how it works
 
-ISS-MCMC is "informed" because it makes use of a measure of similarity with respect to the full dataset through summary statistics. It is "sub-sampling" because it uses this measure to select a subset of the dataset that will be used by the Markov transition kernel at the $k$-th iteration of the algorithm. In this way, the Markov chain transition kernel uses only a fraction $n/N$ of the entire dataset. They show using examples that choosing $n \ll N$ can lead to significant reductions in computational run-times while still retaining the simplicity of the standard Metropolis-Hastings algorithm. In the following subsections we consider in more detail the main ideas of how this algorithm works.
+Let $(Y_{1}, \dots, Y_N)$ be a set of observed data and define
+$Y_{U} = \{Y_{k}, k \in U \}$ where $U \subset \{1, \dots, N\}$. Let $\mathcal{S}: Y \to S\subseteq \mathbb{R}^{s}$. So $\mathcal{S}$ takes the data and returns an $s$ dimensional function of them, $S\subseteq \mathbb{R}^{s}$. If the model admits a sufficient statistic, then $\mathcal{S}$ maps $Y$ or a subset of it $Y_{U}$ to it, otherwise $\mathcal{S}$ maps $Y$ or a subset of it $Y_{U}$ to summary statistics $\bar{S} = S(Y_{U})/n$. See @Maire2019 p. 452, 453, 456. 
+
+<!-- Summary statistics are a set of numerical measures that are used to describe the essential features of a data set. These measures provide a quick and easy way to understand the key characteristics of a dataset, such as its center, spread, and shape. The most commonly used summary statistics include measures of central tendency, such as the mean, median, and mode, which give an indication of where the data cluster around. Measures of variability, such as the standard deviation and range, provide information about how spread out the data are. Other summary statistics, such as skewness and kurtosis, give an indication of the shape of the distribution. By using summary statistics, researchers and data analysts can quickly get a sense of what the data looks like, which can help guide further analysis and interpretation. -->
+
+<!-- The choice of the summary statistics in the algorithm is -->
+<!-- problem specific and is meant to be the counterpart of the -->
+<!-- sufficient statistic mapping for general models (hence sharing, slightly abusively, the same notation). Since the question -->
+<!-- of specifying summary statistics also arises in Approximate Bayesian Computation (ABC), one can take advantage -->
+<!-- of the abundant ABC literature on this topic to find some -->
+<!-- examples of summary statistics for usual likelihood models. -->
+
+For all $n \leq N$ , they define $\textsf{U}_{n}$ as the set of possible combinations of $n$ different integer numbers less than or equal to $N$ and $\mathcal{U}_{n}$ as the powerset of $\textsf{U}_{n}$. For any subset $U \in \textsf{U}_{n}$ define the vector of difference of sufficient statistics between the whole dataset and the subset $Y_{U}$ to be:
+
+\begin{equation}\label{eqn1}
+\Delta_n(U) = \sum_{k = 1}^{N}\mathcal{S}(Y_{k}) - N/n\sum_{k \in U}\mathcal{S}(Y_{k})
+\end{equation}
+
+If there is no sufficient statistic define an analogous difference measure using summary statistics as:
+
+\begin{equation}\label{eqn2}
+\bar{\Delta}_{n}(U) = S(Y)/N - S(Y_{U})/n
+\end{equation}
+
 
 ## Similarity through summary statistics
 
-Summary statistics are a set of numerical measures that are used to describe the essential features of a data set. These measures provide a quick and easy way to understand the key characteristics of a dataset, such as its center, spread, and shape. The most commonly used summary statistics include measures of central tendency, such as the mean, median, and mode, which give an indication of where the data cluster around. Measures of variability, such as the standard deviation and range, provide information about how spread out the data are. Other summary statistics, such as skewness and kurtosis, give an indication of the shape of the distribution. By using summary statistics, researchers and data analysts can quickly get a sense of what the data looks like, which can help guide further analysis and interpretation.
+They then consider the distribution $\nu_{n, \epsilon}$ on the discrete space $\textsf{U}_{n}$ defined for all $\epsilon \geq 0$ by:
 
-The choice of the summary statistics in the algorithm is
-problem specific and is meant to be the counterpart of the
-sufficient statistic mapping for general models (hence sharing, slightly abusively, the same notation). Since the question
-of specifying summary statistics also arises in Approximate Bayesian Computation (ABC), one can take advantage
-of the abundant ABC literature on this topic to find some
-examples of summary statistics for usual likelihood models.
+\begin{equation}\label{eqn3}
+\nu_{n, \epsilon}(U) \propto \text{exp}(-\epsilon ||\Delta_{n}(U) ||^2)
+\end{equation}
 
-## Transition kernel
+The distribution $\nu_{n, \epsilon}$ assigns a weight to any subset according to its representativeness with respect to the full dataset. It is a kind of tuning parameter. When $\epsilon = 0$, $\nu_{n, \epsilon}$ is uniform on $U_{n}$, while when $\epsilon \to \infty$, $\nu_{n, \epsilon}$ is uniform on the set of subsets that minimize $||\Delta_{n}(U)||$. The authors note that moving to general models (i.e. non i.i.d and non-exponential) amounts to relaxing the sufficient statistics existence assumption as well as the $\epsilon \to \infty$ condition. This is achieved by constructing a class of summary statistics for the model at hand and for which the following result holds. (We do not go into the details here - See @Maire2019 p. 454 Proposition 3)
 
-[Jizhi add details here]
+For any $\theta \in \Theta$ and $\epsilon \> 0$, there exists $M < \infty$ such that 
+\[
+\mathbb{E}_{n, \epsilon} \bigg\{\frac{f(Y | \theta)}{f(Y_{U}|\theta)^{N/n}}\bigg\} < M
+\]
+
+## Setting up the algorithm
+
+[Jizhi add details here Section 4.2.2]
 
 ## The Algorithm
 
-[David write out algorithm from the paper]
-
+[David to type out the table here]
 
 # Example with logistic regression
 
-Here we reproduce one example in their paper for the case of logistic regression. See section 6.3
+Here we implement one example from their paper. The example involves simulated logistic regression data with $N= 10^6$ observations and $n = 1000, 5000 and 1000$
 
-[Meet to code example next week]
+[Jizhi and David section 6.3]
+
+```{r "MCMC code", echo=FALSE}
+##add our code here.
+
+```
 
 
-## Compare convergence of ISS-MCMC with M-H.
+Here are marginal distributions and traceplots obtained using the ISS-MCMC algorithm.
 
-[Add after coding example]
+```{r "plots", echo=FALSE}
+
+
+```
+
+
+## Compare computational time of ISS-MCMC with M-H.
+
+Finally, we present tables that compare the computational time of using ISS-MCMC,
+
+```{r "tab1", echo=FALSE}
+#add tables here using system.time() function.
+
+```
+
+
+# Conclusion and Future Work
+
+[David add details here]
 
 # References
 
