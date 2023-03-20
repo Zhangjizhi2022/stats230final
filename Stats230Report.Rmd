@@ -76,9 +76,14 @@ ISS-MCMC is "informed" because it makes use of a measure of similarity with resp
 
 ## Similarity through summary statistics
 
-See @Fearnhead2012 
+Summary statistics are a set of numerical measures that are used to describe the essential features of a data set. These measures provide a quick and easy way to understand the key characteristics of a dataset, such as its center, spread, and shape. The most commonly used summary statistics include measures of central tendency, such as the mean, median, and mode, which give an indication of where the data cluster around. Measures of variability, such as the standard deviation and range, provide information about how spread out the data are. Other summary statistics, such as skewness and kurtosis, give an indication of the shape of the distribution. By using summary statistics, researchers and data analysts can quickly get a sense of what the data looks like, which can help guide further analysis and interpretation.
 
-[Jizhi add details here]
+The choice of the summary statistics in the algorithm is
+problem specific and is meant to be the counterpart of the
+sufficient statistic mapping for general models (hence sharing, slightly abusively, the same notation). Since the question
+of specifying summary statistics also arises in Approximate Bayesian Computation (ABC), one can take advantage
+of the abundant ABC literature on this topic to find some
+examples of summary statistics for usual likelihood models.
 
 ## Transition kernel
 
