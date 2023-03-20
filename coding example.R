@@ -1,18 +1,19 @@
 set.seed(17)
 mean<-c(1,1)
 sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
-sim<-mvrnorm(500,mean,sigma)
-y=rbinom(500,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
-N = length(y)
+N = 10000
+sim<-mvrnorm(N,mean,sigma)
+y=rbinom(N,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
+
 d = 3
-n <- 100
+n <- 1000
 delta <- 0.1
 epsilon <- 0.005
 iter <- 10000
 U <- matrix(NA, nrow=N, ncol=iter+1)
 betas <- matrix(NA, nrow=d, ncol=iter+1)
 betas[, 1] <- c(rep(0.5, d))
-U[, 1] <- c(rep(0, 400), rep(1, 100))
+U[, 1] <- c(rep(0, N-n), rep(1, n))
 
 loglike <- function(beta, x, y) {
   eta <- x %*% beta
@@ -29,13 +30,13 @@ prior <- function(beta) {
 
 for (i in 1:iter){
   set.seed(i)
-  U.prop <-sample(1:500, n, replace = FALSE)
+  U.prop <-sample(1:N, n, replace = FALSE)
   y.cur <- y[which(U[, i] == 1)]
   y.prop <- y[U.prop]
   delta_n.prop <- sum(y) - N/n*sum(y.prop)
   delta_n <- sum(y)- N/n*sum(y.cur)
   b <- exp(epsilon*(delta_n^2-delta_n.prop^2))
-  U[,i+1] <- rep(0,500)
+  U[,i+1] <- rep(0,N)
   if (runif(1) < b){
     U[,i+1][U.prop] <- 1
   }
@@ -59,6 +60,7 @@ for (i in 1:iter){
   
  plot(density(betas[1,]),type = 'l') 
  result1<- betas 
+ ##result1: n=1000, epsilon=0.005
   
   
  for (i in 1:iter){
@@ -79,8 +81,9 @@ for (i in 1:iter){
  }  
   
   result2 <- betas
+  ##result2: MH
   
-  n<-70
+  n<-5000
   for (i in 1:iter){
     set.seed(i)
     U.prop <-sample(1:500, n, replace = FALSE)
@@ -113,7 +116,7 @@ for (i in 1:iter){
   
   lines(density(betas[1,]),type = 'l',col='blue') 
   result3<- betas 
-  
+  ##result3: n=5000, epsilon=0.005
   plot(betas[1,],type = 'l')
   
   
