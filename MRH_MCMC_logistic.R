@@ -25,6 +25,19 @@ MRH_MCMC_logistic <- function(sim,y, d, delta){
     #initializing
     betas[, 1] <- c(rep(0.5, d))
     
+    #likelihood function
+    loglike <- function(beta, x, y) {
+      eta <- x %*% beta
+      loglike <- sum(y * eta - log(1 + exp(eta)))
+      return(loglike)
+    }
+    
+    # Define the prior distribution for beta
+    prior <- function(beta) {
+      prior <- dnorm(beta, 0, 10, log = TRUE)
+      return(prior)
+    }
+    
     #running the MRH algorithm
     betas.prop <- rep(0,3)
     betas.prop[1] <- betas[1,i]+runif(1,min = -delta, max = delta)

@@ -3,9 +3,9 @@
 set.seed(17)
 mean<-c(1,1)
 sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
+N = 10000
 sim<-mvrnorm(N,mean,sigma)
 y=rbinom(N,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
-N = 10000
 n = 1000
 d = 3
 epsilon = 0.005
@@ -80,6 +80,19 @@ MRH_MCMC_logistic <- function(sim,y,d, delta){
     #initializing
     betas[, 1] <- c(rep(0.5, d))
     
+    #likelihood function
+    loglike <- function(beta, x, y) {
+      eta <- x %*% beta
+      loglike <- sum(y * eta - log(1 + exp(eta)))
+      return(loglike)
+    }
+    
+    # Define the prior distribution for beta
+    prior <- function(beta) {
+      prior <- dnorm(beta, 0, 10, log = TRUE)
+      return(prior)
+    }
+    
     #running the MRH algorithm
     betas.prop <- rep(0,3)
     betas.prop[1] <- betas[1,i]+runif(1,min = -delta, max = delta)
@@ -93,8 +106,7 @@ MRH_MCMC_logistic <- function(sim,y,d, delta){
     betas[,i+1] <- rep(0,3)
     if (runif(1) < ratio){
       betas[,i+1] <- betas.prop
-    }
-    else betas[,i+1] <- betas[,i]
+    } else betas[,i+1] <- betas[,i]
   }  
   return(betas)
 }
@@ -105,7 +117,7 @@ MRH_MCMC_logistic <- function(sim,y,d, delta){
 ##Benchmarking
 set.seed(23758)
 library(bench)
-ISS_results <- as.data.frame(bench::mark())
-MRH_results <- as.data.frame(bench::mark())
+ISS_results <- as.data.frame(bench::mark(ISS_MCMC_logistic(sim, y, n, d, delta, epsilon, iter)))
+MRH_results <- as.data.frame(bench::mark(MRH_MCMC_logistic(sim, y, d, delta)))
 benchmark_results <- rbind(ISS_results, MRH_results)
 rownames(results) <- c("ISS_MCMC", "MRH_MCMC")

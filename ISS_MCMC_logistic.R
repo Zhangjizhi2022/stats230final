@@ -15,9 +15,9 @@
 #' Simulated Data
 #' mean<-c(1,1)
 #' sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
+#' N = 10000
 #' sim<-mvrnorm(N,mean,sigma)
 #' y=rbinom(N,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
-#' N = 10000
 #' n = 1000
 #' d = 3
 #' epsilon = 0.005
