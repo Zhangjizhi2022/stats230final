@@ -70,9 +70,22 @@ As a consequence MCMC with the MRH algorithm cannot be considered for reasonable
 
 In our report we consider a paper by @Maire2019 that addresses the problem of using MCMC for large datasets. This paper proposes a new methodology, which the authors call \textit{Informed Sub-Sampling MCMC} (ISS-MCMC), for doing Bayesian MCMC approximation of the posterior distribution. This is a scalable version of the Metropolis-Hastings algorithm designed for situations when $N$ is so big that to approximate the posterior distribution takes a very long time. 
 
+# Comparison with other approaches
+
+Other similar approaches to solve the same statistical problems are @Quiroz2018 and the \textit{Confidence Sampler} in @Bardenet2017. Both of these approaches use sophisticated "control variates" to get positive unbiased estimators (based on a subset of data) for the likelihoods in the Metropolis-Hastings acceptance ratio. The authors note that these control variates are computationally intensive.
+
+The noisy approaches due to @Korattikara2014 and @Alquier2016
+
+@Maclaurin2015 also addresses the computational issue are independent.
+
+Another approach which the authors compare their approach with is an approach based on continuous time Markov processes (Langevin diffusion, Zig-Zag process) in @Fearnhead2018 and @Bierkens2019. Here, the authors note that the computational hurdle involves calculation of the gradient of the log-likelihood, which may not always be unbiased. Moreover, these approaches depart significantly from the simplicity of the original discrete M-H algorithm.
+
+[David add details]
+
+
 # Main ideas of how it works
 
-ISS-MCMC is "informed" because it makes use of a measure of similarity with respect to the full dataset through summary statistics. It is "sub-sampling" because it uses this measure to select a subset of the dataset that will be used by the Markov transition kernel at the $k$-th iteration of the algorithm. In this way, the Markov chain transition kernel uses only a fraction $n/N$ of the entire dataset. They show using examples that choosing $n \ll N$ can lead to significant reductions in computational run-times while still retaining the simplicity of the standard Metropolis-Hastings algorithm. In the following subsections we consider in more detail the main ideas of how this algorithm works. See section 4.
+ISS-MCMC is "informed" because it makes use of a measure of similarity with respect to the full dataset through summary statistics. It is "sub-sampling" because it uses this measure to select a subset of the dataset that will be used by the Markov transition kernel at the $k$-th iteration of the algorithm. In this way, the Markov chain transition kernel uses only a fraction $n/N$ of the entire dataset. They show using examples that choosing $n \ll N$ can lead to significant reductions in computational run-times while still retaining the simplicity of the standard Metropolis-Hastings algorithm. In the following subsections we consider in more detail the main ideas of how this algorithm works.
 
 ## Similarity through summary statistics
 
@@ -91,19 +104,8 @@ examples of summary statistics for usual likelihood models.
 
 ## The Algorithm
 
-[Copy-paste]
+[David write out algorithm from the paper]
 
-# Comparison with other approaches
-
-Other similar approaches to solve the same statistical problems are @Quiroz2018 and the \textit{Confidence Sampler} in @Bardenet2017. Both of these approaches use sophisticated "control variates" to get positive unbiased estimators (based on a subset of data) for the likelihoods in the Metropolis-Hastings acceptance ratio. The authors note that these control variates are computationally intensive.
-
-The noisy approaches due to @Korattikara2014 and @Alquier2016
-
-@Maclaurin2015 also addresses the computational issue are independent.
-
-Another approach which the authors compare their approach with is an approach based on continuous time Markov processes (Langevin diffusion, Zig-Zag process) in @Fearnhead2018 and @Bierkens2019. Here, the authors note that the computational hurdle involves calculation of the gradient of the log-likelihood, which may not always be unbiased. Moreover, these approaches depart significantly from the simplicity of the original discrete M-H algorithm.
-
-[David add details]
 
 # Example with logistic regression
 
