@@ -1,6 +1,5 @@
-set.seed(17)
-
 ##Simulated Data
+set.seed(17)
 mean<-c(1,1)
 sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
 N = 10000

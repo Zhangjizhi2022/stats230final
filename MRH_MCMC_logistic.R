@@ -1,3 +1,20 @@
+#' Original MRH MCMC function
+#'
+#' @param d 
+#' @param delta 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' ##Simulated Data
+#' set.seed(17)
+#' mean<-c(1,1)
+#' sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
+#' N = 10000
+#' sim<-mvrnorm(N,mean,sigma)
+#' y=rbinom(N,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
+
 MRH_MCMC_logistic <- function(d, delta){
   for (i in 1:iter){
     #allocate space to store output
