@@ -125,7 +125,7 @@ In the Informed Sub-Sampling method, the set of good subsamples is treated as a 
 
 (b) Set $U_{i+1}=U$ with probability 
 \begin{equation}\label{eqn4}
-\beta(U_i, U)=1 \wedge b(U_i, U)
+\beta(U_i, U)= \text{min}\{ b(U_i, U), 1\}
 \end{equation}
 , where 
 \begin{equation}\label{eqn5}
@@ -138,7 +138,7 @@ b(U_i, U) = \exp \left( \epsilon(|\Delta_n(U_i)|^2 - |\Delta_n(U)|^2) \right)
 
 (b)Set $\theta_{i+1}=\theta$ with probability 
 \begin{equation}\label{eqn6}
-\alpha(\theta_i, \theta)=1 \wedge a(\theta_i, \theta)
+\alpha(\theta_i, \theta)= \text{min} \{a(\theta_i, \theta), 1\}
 \end{equation}
 , where 
 \begin{equation}\label{eqn7}
@@ -201,39 +201,245 @@ P(Y=1) = \frac{\exp(\beta_0 + \beta_1X_1 + \beta_2X_2)}{1+\exp(\beta_0 + \beta_1
 
 We simulate N times with $\beta_0=-1$, $\beta_1=1$ and $\beta_2=0$
 
+```{r "MCMC code", echo=FALSE, cache=TRUE}
+##Simulated Data
+library(MASS)
+set.seed(17)
+mean<-c(1,1)
+sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
+N = 100000
+sim<-mvrnorm(N,mean,sigma)
+y=rbinom(N,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
+n = 1000
+d = 3
+epsilon = 0.005
+delta = 0.2
+iter = 1000
 
-```{r "MCMC code", echo=FALSE}
-##add our code here.
-
-```
 
 
-Here are marginal distributions and traceplots obtained using the ISS-MCMC algorithm.
+##ISS_MCMC_logistic function
 
-```{r "plots", echo=FALSE}
+ISS_MCMC_logistic <- function(sim, y, n, d, delta, epsilon, iter)
+{
+  #storing subsamples and output
+  U <- matrix(NA, nrow=N, ncol=iter+1)
+  betas <- matrix(NA, nrow=d, ncol=iter+1)
+  
+  #initializing
+  betas[, 1] <- c(rep(0.5, d))
+  U[, 1] <- c(rep(0, N-n), rep(1, n))
+  
+  #likelihood function
+  loglike <- function(beta, x, y) {
+    eta <- x %*% beta
+    loglike <- sum(y * eta - log(1 + exp(eta)))
+    return(loglike)
+  }
+  
+  # Define the prior distribution for beta
+  prior <- function(beta) {
+    prior <- dnorm(beta, 0, 10, log = TRUE)
+    return(prior)
+  }
+  
+  for (i in 1:iter){
+    set.seed(i)
+    U.prop <-sample(1:N, n, replace = FALSE)
+    y.cur <- y[which(U[, i] == 1)]
+    y.prop <- y[U.prop]
+    delta_n.prop <- sum(y) - N/n*sum(y.prop)
+    delta_n <- sum(y)- N/n*sum(y.cur)
+    b <- exp(epsilon*(delta_n^2-delta_n.prop^2))
+    U[,i+1] <- rep(0,N)
+    if (runif(1) < b){
+      U[,i+1][U.prop] <- 1
+    }
+    else U[,i+1] <- U[,i]
+    betas.prop <- rep(0,3)
+    betas.prop[1] <- betas[1,i]+runif(1,min = -delta, max = delta)
+    betas.prop[2] <- betas[2,i]+runif(1,min = -delta, max = delta)
+    betas.prop[3] <- betas[3,i]+runif(1,min = -delta, max = delta)
+    y.cur <- y[which(U[, i+1] == 1)]
+    x.cur <- cbind(1,sim[which(U[, i+1] == 1),1],sim[which(U[, i+1] == 1),2])
+    log_ratio <- loglike(betas.prop, x.cur, y.cur) + prior(betas.prop) -
+      loglike(betas[,i], x.cur, y.cur) - prior(betas[,i])
+    ratio <- mean(exp(log_ratio))
+    betas[,i+1] <- rep(0,3)
+    if (runif(1) < ratio){
+      betas[,i+1] <- betas.prop
+    }
+    else betas[,i+1] <- betas[,i]
+  }
+  return(list(betas=betas, U=U))
+}
+
+## MRH_MCMC_logistic function
 
 
+MRH_MCMC_logistic <- function(sim,y, d, delta){
+  
+    #allocate space to store output
+    betas <- matrix(NA, nrow=d, ncol=iter+1)
+    
+    #initializing
+    betas[, 1] <- c(rep(0.5, d))
+    
+    #likelihood function
+    loglike <- function(beta, x, y) {
+      eta <- x %*% beta
+      loglike <- sum(y * eta - log(1 + exp(eta)))
+      return(loglike)
+    }
+    
+    # Define the prior distribution for beta
+    prior <- function(beta) {
+      prior <- dnorm(beta, 0, 10, log = TRUE)
+      return(prior)
+    }
+    
+    #running the MRH algorithm
+    for (i in 1:iter){
+    betas.prop <- rep(0,3)
+    betas.prop[1] <- betas[1,i]+runif(1,min = -delta, max = delta)
+    betas.prop[2] <- betas[2,i]+runif(1,min = -delta, max = delta)
+    betas.prop[3] <- betas[3,i]+runif(1,min = -delta, max = delta)
+    y.cur <- y
+    x.cur <- cbind(1,sim[,1],sim[,2])
+    log_ratio <- loglike(betas.prop, x.cur, y.cur) + prior(betas.prop) -
+      loglike(betas[,i], x.cur, y.cur) - prior(betas[,i])
+    ratio <- mean(exp(log_ratio))
+    betas[,i+1] <- rep(0,3)
+    if (runif(1) < ratio){
+      betas[,i+1] <- betas.prop
+    } else betas[,i+1] <- betas[,i]
+  }  
+  return(betas)
+}
 ```
 
 
 ## Compare computational time of ISS-MCMC with M-H.
 
-Finally, we present tables that compare the computational time of using ISS-MCMC,
+Finally, we present tables that compare the computational time of using ISS-MCMC. See Table \@ref(tab:tab1).
 
-```{r "tab1", echo=FALSE}
-#add tables here using system.time() function.
-
+```{r "computing time", echo=FALSE, cache=TRUE}
+mrhtime <-system.time({MRH_MCMC_logistic(sim,y, d, delta)})
+iss_100 <-system.time({ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon, iter)})
+iss_500 <-system.time({ISS_MCMC_logistic(sim, y, n=500, d, delta, epsilon, iter)})
+iss_1000<-system.time({ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon, iter)})
 ```
 
 
+```{r "display", echo=FALSE}
+library(kableExtra)
+comparison <- rbind(mrhtime, iss_100, iss_500, iss_1000)
+comparison <- as.matrix(comparison[, 3])
+colnames(comparison) <- c("Computational Time (s)")
+rownames(comparison) <- c("MRH", "ISS MCMC (n = 100)",
+                          "ISS MCMC (n = 500)",
+                          "ISS MCMC (n = 1000)")
+```
+
+
+```{r "tab1", echo=FALSE}
+comparison %>%
+  kable(format="latex",
+        digits=4,
+        caption ="Comparing Computational Time of MRH to ISS MCMC",
+        booktabs = TRUE)
+```
 
 # Conclusion and Future Work
 
 Since we could not handle simulated data of the order $10^6$, future work can include using a computer with more memory to handle such a large dataset in order to fully reproduce their example and check for any significant gains in reducing computational time. Also future work can include using different tuning parameters $\epsilon$ to investigate the quality the estimates for different choices of $\epsilon$.
 
+\newpage
+# Appendix
 
+Here are marginal distributions and traceplots obtained using the ISS-MCMC algorithm.
+
+```{r "plots", echo=FALSE, cache=TRUE}
+r1=MRH_MCMC_logistic(sim,y, d, delta)
+r2=ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon=0.00005, iter)$betas
+r3=ISS_MCMC_logistic(sim, y, n=500, d, delta, epsilon=0.00005, iter)$betas
+r4=ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon=0.00005, iter)$betas
+r5=ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon=0, iter)$betas
+r6=ISS_MCMC_logistic(sim, y, n=500, d, delta, epsilon=0, iter)$betas
+r7=ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon=0, iter)$betas
+
+# for n=100
+#beta0
+plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5))
+lines(density(r2[1,]),col='red')
+lines(density(r5[1,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+#beta1
+plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5))
+lines(density(r2[2,]),col='red')
+lines(density(r5[2,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+#beta2
+plot(density(r1[2,]),xlab = 'beta2',ylab = 'density',xlim=c(-0.5,0.5))
+lines(density(r2[2,]),col='red')
+lines(density(r5[2,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+
+# for n=500
+#beta0
+plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5))
+lines(density(r3[1,]),col='red')
+lines(density(r6[1,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+#beta1
+plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5))
+lines(density(r3[2,]),col='red')
+lines(density(r6[2,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+#beta2
+plot(density(r1[2,]),xlab = 'beta2',ylab = 'density',xlim=c(-0.5,0.5))
+lines(density(r3[2,]),col='red')
+lines(density(r6[2,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+# for n=1000
+#beta0
+plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5))
+lines(density(r4[1,]),col='red')
+lines(density(r7[1,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+#beta1
+plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5))
+lines(density(r4[2,]),col='red')
+lines(density(r7[2,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+#beta2
+plot(density(r1[2,]),xlab = 'beta2',ylab = 'density',xlim=c(-0.5,0.5))
+lines(density(r4[2,]),col='red')
+lines(density(r7[2,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+```
+
+
+\newpage
 # References
-
 
 
 
