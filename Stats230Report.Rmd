@@ -162,7 +162,7 @@ a(\theta_i, \theta) =  \frac{\pi_n(\theta \mid Y_{U_{i+1}})Q(\theta, \theta_i)} 
 
 # Example with logistic regression
 
-Here we implement one example from their paper. The example involves simulated logistic regression data with $N= 10^6$ observations and $n = 1000, 5000$ and $1000$
+Here we implement one example from their paper. Their example involves simulated logistic regression data with $N= 10^6$ observations. However given our limited computational memory, we could not implement the full $N = 10^{6}$ simulated example. Instead, we ran our simulation for $N = 10^5$ using and $n = 1000, 5000$ and $1000$ and compared our results to the MRH without sub sampling.
 
 Consider the logistic regression model:
 \begin{equation}
