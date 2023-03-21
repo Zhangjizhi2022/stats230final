@@ -86,15 +86,6 @@ Another approach which the authors compare their approach with is an approach ba
 Let $(Y_{1}, \dots, Y_N)$ be a set of observed data and define
 $Y_{U} = \{Y_{k}, k \in U \}$ where $U \subset \{1, \dots, N\}$. Let $\mathcal{S}: Y \to S\subseteq \mathbb{R}^{s}$. So $\mathcal{S}$ takes the data and returns an $s$ dimensional function of them, $S\subseteq \mathbb{R}^{s}$. If the model admits a sufficient statistic, then $\mathcal{S}$ maps $Y$ or a subset of it $Y_{U}$ to it, otherwise $\mathcal{S}$ maps $Y$ or a subset of it $Y_{U}$ to summary statistics $\bar{S} = S(Y_{U})/n$. See @Maire2019 p. 452, 453, 456. 
 
-<!-- Summary statistics are a set of numerical measures that are used to describe the essential features of a data set. These measures provide a quick and easy way to understand the key characteristics of a dataset, such as its center, spread, and shape. The most commonly used summary statistics include measures of central tendency, such as the mean, median, and mode, which give an indication of where the data cluster around. Measures of variability, such as the standard deviation and range, provide information about how spread out the data are. Other summary statistics, such as skewness and kurtosis, give an indication of the shape of the distribution. By using summary statistics, researchers and data analysts can quickly get a sense of what the data looks like, which can help guide further analysis and interpretation. -->
-
-<!-- The choice of the summary statistics in the algorithm is -->
-<!-- problem specific and is meant to be the counterpart of the -->
-<!-- sufficient statistic mapping for general models (hence sharing, slightly abusively, the same notation). Since the question -->
-<!-- of specifying summary statistics also arises in Approximate Bayesian Computation (ABC), one can take advantage -->
-<!-- of the abundant ABC literature on this topic to find some -->
-<!-- examples of summary statistics for usual likelihood models. -->
-
 For all $n \leq N$ , they define $\textsf{U}_{n}$ as the set of possible combinations of $n$ different integer numbers less than or equal to $N$ and $\mathcal{U}_{n}$ as the powerset of $\textsf{U}_{n}$. For any subset $U \in \textsf{U}_{n}$ define the vector of difference of sufficient statistics between the whole dataset and the subset $Y_{U}$ to be:
 
 \begin{equation}\label{eqn1}
@@ -125,21 +116,19 @@ For any $\theta \in \Theta$ and $\epsilon \> 0$, there exists $M < \infty$ such 
 
 ## Setting up the algorithm
 
-[Jizhi add details here Section 4.2.2]
 
-In the Informed Sub-Sampling method, the set of good subsamples is treated as a series of missing data (denoted by $U_{1}$, $U_{2}$, and so on) and is simulated using the ISS-MCMC algorithm. This algorithm generates a Markov chain on the extended space 
-$\theta \times  \mathcal{U}_{n}$, where $\mathcal{U}_{n}$ is the set of possible subsamples. The sequence of subsamples is randomly updated in a way that favors those subsets with summary statistics that are similar to the full dataset, as suggested by the analysis in previous sections. The process is implemented using a symmetric transition kernel R on $(\mathcal{U}_n, U_n)$. A transition from $(\theta_i,U_i)$ to $(\theta_{I+1} , U_{i+1})$ involves two steps:
+In the Informed Sub-Sampling method, the set of good subsamples is treated as a series of missing data (denoted by $U_{1}$, $U_{2}$, and so on) and is simulated using the ISS-MCMC algorithm. This algorithm generates a Markov chain on the extended space $\theta \times  \mathcal{U}_{n}$, where $\mathcal{U}_{n}$ is the set of possible sub-samples. The sequence of sub samples is randomly updated in a way that favors those subsets with summary statistics that are similar to the full dataset, as suggested by the analysis in previous sections. The process is implemented using a symmetric transition kernel $R$ on $(\mathcal{U}_n, U_n)$. A transition from $(\theta_i,U_i)$ to $(\theta_{I+1} , U_{i+1})$ involves two steps:
 
 (i)
 
 (a) Propose a new subset variable $U \sim R(U_i, \cdot)$
 
 (b) Set $U_{i+1}=U$ with probability 
-\begin{equation}
+\begin{equation}\label{eqn4}
 \beta(U_i, U)=1 \wedge b(U_i, U)
 \end{equation}
 , where 
-\begin{equation}
+\begin{equation}\label{eqn5}
 b(U_i, U) = \exp \left( \epsilon(|\Delta_n(U_i)|^2 - |\Delta_n(U)|^2) \right)
 \end{equation}, and $U_{i+1} = U_i$ with probability $1 - \beta(U_i, U)$. Here, $\Delta_n$ is defined in equation 2. The transition kernel R is selected based on the data and distribution.
 
@@ -148,17 +137,58 @@ b(U_i, U) = \exp \left( \epsilon(|\Delta_n(U_i)|^2 - |\Delta_n(U)|^2) \right)
 (a)propose a new parameter $\theta \sim Q(\theta_i, \cdot)$
 
 (b)Set $\theta_{i+1}=\theta$ with probability 
-\begin{equation}
+\begin{equation}\label{eqn6}
 \alpha(\theta_i, \theta)=1 \wedge a(\theta_i, \theta)
 \end{equation}
 , where 
-\begin{equation}
+\begin{equation}\label{eqn7}
 a(\theta_i, \theta) =  \frac{\pi_n(\theta \mid Y_{U_{i+1}})Q(\theta, \theta_i)} {\pi_n(\theta_i \mid Y_{U_{i+1}})Q(\theta_i, \theta)}
 \end{equation}, and $\theta_{i+1} = \theta_i$ with probability $1 - \alpha(U_i, U)$. The transition kernel Q is selected based on the data and distribution.
 
 ## The Algorithm
 
-[David to type out the table here]
+Here is the pseudo-code for the Informed Subsampling Algorithm:
+
+\begin{tabular}{l  l}
+\hline
+&Informed Sub-Sampling MCMC\\
+&Algorithm \\
+\hline
+1: &\textbf{Input}: \textbf{initial state}\\
+   &$(\tilde{\theta}_{0}, U_{0})$ \\
+   &\textbf{and summary statistics} \\
+   &$S_{0} = \bar{S}(Y_{U_{0}})$\\
+   &$S^{*} = \bar{S}(Y)$ \\
+2: &\textbf{for} $i = 1, 2, \dots$ \textbf{do} \\
+3: & propose a new subset\\
+   & $U \sim R(U_{i=1}, \cdot)$ \\
+   & and draw \\
+   & $J \sim \text{Unif}(0,1)$ \\
+4: & compute $S = \bar{S}(Y_{U})$ and \\
+   & $b = b(U_{i - 1}, U)$\\
+   & defined in (4) \\
+5: & \textbf{if} $J \leq b$ \textbf{then}\\
+6: &  set $U_{i} = U$ and $S_{i} = S$\\
+7: & \textbf{else}\\
+8: &  set $U_{i} = U_{i -1}$\\
+   &  and $S_{i} = S_{i - 1}$ \\
+9: & \textbf{end if} \\
+10:& propose a new parameter \\
+   & $\tilde{\theta} \sim Q(\tilde{\theta}_{i - 1}; \cdot)$ \\
+   & and draw $I \sim \text{Unif}(0, 1)$ \\
+11:& compute $\tilde{\pi}(\tilde{\theta}_{i - 1}|Y_{U_{i}})$,\\
+   & $\tilde{\pi}_{n}(\tilde{\theta}|Y_{U_{i}})$ and \\ 
+   & $\tilde{a}(\tilde{\theta}_{i - 1}|U_{i})$ defined in (7)\\
+12:& \textbf{if} $I \leq \tilde{a}$ \textbf{then}\\
+13:& set $\tilde{\theta_{i}} = \tilde{\theta}$ \\
+14:& \textbf{else} \\
+15:& set $\tilde{\theta_{i}} = \tilde{\theta_{i - 1}}$\\
+16:& \textbf{end if} \\
+17:& \textbf{end for} \\
+18:& \textbf{return: Markov Chain} $\{(\tilde{\theta_{i}}, U_{i}), i \in \mathbb{N}\}$ \\
+\hline
+\end{tabular}
+
 
 # Example with logistic regression
 
@@ -171,8 +201,6 @@ P(Y=1) = \frac{\exp(\beta_0 + \beta_1X_1 + \beta_2X_2)}{1+\exp(\beta_0 + \beta_1
 
 We simulate N times with $\beta_0=-1$, $\beta_1=1$ and $\beta_2=0$
 
-
-[Jizhi and David section 6.3]
 
 ```{r "MCMC code", echo=FALSE}
 ##add our code here.
@@ -198,9 +226,11 @@ Finally, we present tables that compare the computational time of using ISS-MCMC
 ```
 
 
+
 # Conclusion and Future Work
 
-[David add details here]
+Since we could not handle simulated data of the order $10^6$, future work can include using a computer with more memory to handle such a large dataset in order to fully reproduce their example and check for any significant gains in reducing computational time. Also future work can include using different tuning parameters $\epsilon$ to investigate the quality the estimates for different choices of $\epsilon$.
+
 
 # References
 
