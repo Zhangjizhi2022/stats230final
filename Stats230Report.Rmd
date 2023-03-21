@@ -167,7 +167,9 @@ Here we implement one example from their paper. The example involves simulated l
 Consider the logistic regression model:
 \begin{equation}
 P(Y=1) = \frac{\exp(\beta_0 + \beta_1X_1 + \beta_2X_2)}{1+\exp(\beta_0 + \beta_1X_1 + \beta_2X_2)}
-\end{equation},
+\end{equation}
+
+We simulate N times with $\beta_0=-1$, $\beta_1=1$ and $\beta_2=0$
 
 
 [Jizhi and David section 6.3]

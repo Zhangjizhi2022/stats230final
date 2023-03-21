@@ -117,6 +117,15 @@ MRH_MCMC_logistic <- function(sim,y, d, delta){
 system.time({MRH_MCMC_logistic(sim,y, d, delta)})
 system.time({ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon, iter)})
 
+r1=MRH_MCMC_logistic(sim,y, d, delta)
+r2=ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon=0.000005, iter)$betas
+r3=ISS_MCMC_logistic(sim, y, n=500, d, delta, epsilon, iter)$betas
+r4=ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon, iter)$betas
+r5=ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon=0, iter)$betas
+
+plot(density(r2[2,]))
+lines(density(r5[2,]))
+
 
 ##Benchmarking
 set.seed(23758)
