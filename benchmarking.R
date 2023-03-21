@@ -4,7 +4,7 @@ library(MASS)
 set.seed(17)
 mean<-c(1,1)
 sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
-N = 10000
+N = 100000
 sim<-mvrnorm(N,mean,sigma)
 y=rbinom(N,1,exp(-1+sim[,1])/(1+exp(-1+sim[,1])))
 n = 1000
@@ -116,15 +116,84 @@ MRH_MCMC_logistic <- function(sim,y, d, delta){
 
 system.time({MRH_MCMC_logistic(sim,y, d, delta)})
 system.time({ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon, iter)})
+system.time({ISS_MCMC_logistic(sim, y, n=500, d, delta, epsilon, iter)})
+system.time({ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon, iter)})
 
 r1=MRH_MCMC_logistic(sim,y, d, delta)
-r2=ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon=0.000005, iter)$betas
-r3=ISS_MCMC_logistic(sim, y, n=500, d, delta, epsilon, iter)$betas
-r4=ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon, iter)$betas
+r2=ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon=0.00005, iter)$betas
+r3=ISS_MCMC_logistic(sim, y, n=500, d, delta, epsilon=0.00005, iter)$betas
+r4=ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon=0.00005, iter)$betas
 r5=ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon=0, iter)$betas
+r6=ISS_MCMC_logistic(sim, y, n=500, d, delta, epsilon=0, iter)$betas
+r7=ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon=0, iter)$betas
 
-plot(density(r2[2,]))
-lines(density(r5[2,]))
+# for n=100
+#beta0
+plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5))
+lines(density(r2[1,]),col='red')
+lines(density(r5[1,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+#beta1
+plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5))
+lines(density(r2[2,]),col='red')
+lines(density(r5[2,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+#beta2
+plot(density(r1[2,]),xlab = 'beta2',ylab = 'density',xlim=c(-0.5,0.5))
+lines(density(r2[2,]),col='red')
+lines(density(r5[2,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+
+# for n=500
+#beta0
+plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5))
+lines(density(r3[1,]),col='red')
+lines(density(r6[1,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+#beta1
+plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5))
+lines(density(r3[2,]),col='red')
+lines(density(r6[2,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+#beta2
+plot(density(r1[2,]),xlab = 'beta2',ylab = 'density',xlim=c(-0.5,0.5))
+lines(density(r3[2,]),col='red')
+lines(density(r6[2,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+# for n=1000
+#beta0
+plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5))
+lines(density(r4[1,]),col='red')
+lines(density(r7[1,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+#beta1
+plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5))
+lines(density(r4[2,]),col='red')
+lines(density(r7[2,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+#beta2
+plot(density(r1[2,]),xlab = 'beta2',ylab = 'density',xlim=c(-0.5,0.5))
+lines(density(r4[2,]),col='red')
+lines(density(r7[2,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
 
 
 ##Benchmarking
