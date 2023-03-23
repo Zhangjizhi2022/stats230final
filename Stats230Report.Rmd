@@ -378,23 +378,20 @@ r7=ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon=0, iter)$betas
 
 
 ```{r "plots", echo=FALSE, cache=TRUE}
+#trace plot
+plot(r2[1,],main='trace plot of beta0 in ISS_MCMC method for n=100')
+plot(r2[2,],main='trace plot of beta1 in ISS_MCMC method for n=100')
+
 # for n=100
 #beta0
-plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5))
+plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5),main='Density plots for beta0 when n=100')
 lines(density(r2[1,]),col='red')
 lines(density(r5[1,]),col='blue')
 legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
        col = c("black", "red", "blue"), lwd = 2)
 
 #beta1
-plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5))
-lines(density(r2[2,]),col='red')
-lines(density(r5[2,]),col='blue')
-legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
-       col = c("black", "red", "blue"), lwd = 2)
-
-#beta2
-plot(density(r1[2,]),xlab = 'beta2',ylab = 'density',xlim=c(-0.5,0.5))
+plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5),main='Density plots for beta1 when n=100')
 lines(density(r2[2,]),col='red')
 lines(density(r5[2,]),col='blue')
 legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
@@ -403,47 +400,35 @@ legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"),
 
 # for n=500
 #beta0
-plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5))
+plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5),main='Density plots for beta0 when n=500')
 lines(density(r3[1,]),col='red')
 lines(density(r6[1,]),col='blue')
 legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
        col = c("black", "red", "blue"), lwd = 2)
 
 #beta1
-plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5))
+plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5),main='Density plots for beta1 when n=500')
 lines(density(r3[2,]),col='red')
 lines(density(r6[2,]),col='blue')
 legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
        col = c("black", "red", "blue"), lwd = 2)
 
-#beta2
-plot(density(r1[2,]),xlab = 'beta2',ylab = 'density',xlim=c(-0.5,0.5))
-lines(density(r3[2,]),col='red')
-lines(density(r6[2,]),col='blue')
-legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
-       col = c("black", "red", "blue"), lwd = 2)
 
 # for n=1000
 #beta0
-plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5))
+plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5),main='Density plots for beta0 when n=1000')
 lines(density(r4[1,]),col='red')
 lines(density(r7[1,]),col='blue')
 legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
        col = c("black", "red", "blue"), lwd = 2)
 
 #beta1
-plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5))
+plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5),main='Density plots for beta1 when n=1000')
 lines(density(r4[2,]),col='red')
 lines(density(r7[2,]),col='blue')
 legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
        col = c("black", "red", "blue"), lwd = 2)
 
-#beta2
-plot(density(r1[2,]),xlab = 'beta2',ylab = 'density',xlim=c(-0.5,0.5))
-lines(density(r4[2,]),col='red')
-lines(density(r7[2,]),col='blue')
-legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
-       col = c("black", "red", "blue"), lwd = 2)
 
 ```
 
