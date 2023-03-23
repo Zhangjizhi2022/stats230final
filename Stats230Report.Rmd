@@ -117,7 +117,7 @@ For any $\theta \in \Theta$ and $\epsilon \> 0$, there exists $M < \infty$ such 
 ## Setting up the algorithm
 
 
-In the Informed Sub-Sampling method, the set of good subsamples is treated as a series of missing data (denoted by $U_{1}$, $U_{2}$, and so on) and is simulated using the ISS-MCMC algorithm. This algorithm generates a Markov chain on the extended space $\theta \times  \mathcal{U}_{n}$, where $\mathcal{U}_{n}$ is the set of possible sub-samples. The sequence of sub samples is randomly updated in a way that favors those subsets with summary statistics that are similar to the full dataset, as suggested by the analysis in previous sections. The process is implemented using a symmetric transition kernel $R$ on $(\textsf{U}_n, \mathcal{U_n})$. A transition from $(\theta_i,U_i)$ to $(\theta_{I+1} , U_{i+1})$ involves two steps:
+In the Informed Sub-Sampling method, the set of good subsamples is treated as a series of missing data (denoted by $U_{1}$, $U_{2}$, and so on) and is simulated using the ISS-MCMC algorithm. This algorithm generates a Markov chain on the extended space $\theta \times  \textsf{U}_{n}$. The sequence of sub samples is randomly updated in a way that favors those subsets with summary statistics that are similar to the full dataset, as suggested by the analysis in previous sections. The process is implemented using a symmetric transition kernel $R$ on $(\textsf{U}_n, \mathcal{U}_n)$. A transition from $(\theta_i,U_i)$ to $(\theta_{i+1} , U_{i+1})$ involves two steps:
 
 (i)
 
@@ -192,7 +192,7 @@ Here is the pseudo-code for the Informed Subsampling Algorithm:
 
 # Example with logistic regression
 
-Here we implement one example from their paper. Their example involves simulated logistic regression data with $N= 10^6$ observations. However given our limited computational memory, we could not implement the full $N = 10^{6}$ simulated example. Instead, we ran our simulation for $N = 10^5$ using and $n = 1000, 5000$ and $1000$ and compared our results to the MRH without sub sampling.
+Here we implement one example from their paper. Their example involves simulated logistic regression data with $N= 10^6$ observations. However given our limited computational memory, we could not implement the full $N = 10^{6}$ simulated example. Instead, we ran our simulation for $N = 10^5$ using and $n = 100, 500$ and $1000$ and compared our results to the MRH without sub sampling.
 
 Consider the logistic regression model:
 \begin{equation}
@@ -201,11 +201,12 @@ P(Y=1) = \frac{\exp(\beta_0 + \beta_1X_1 + \beta_2X_2)}{1+\exp(\beta_0 + \beta_1
 
 We simulate N times with $\beta_0=-1$, $\beta_1=1$ and $\beta_2=0$
 
-We define the prior as a multinormal distribution with mean $\mu=(0,0,0)^T$ and variance $\Sigma=100I$.
+We define the prior as a multivariate normal distribution with mean $\mu=(0,0,0)^T$ and variance $\Sigma=100I$, where $I$ is the identity matrix.
 
-The transition kernel of subsets $R(U_i,U)$ is defined as a random sample from the whole set$\textsf{U}$.
+For the summary statistic $S$ is the sum of $Y_{U}$ since our data is binomial. The transition kernel of subsets $R(U_i,U)$ is defined as a random sample from the set $\textsf{U}_{n}$. The transition kernel of the parameter $Q(\beta_i,\beta)$ is defined as a uniform distribution in $\mathbb{R}^3$ with mean $\beta_i$ and width $\delta=0.2$. We chose this proposal density because it simplifies the calculation of the acceptance ratio in the ISS-MCMC algorithm.
 
-The transition kernel of the parameter$Q(\beta_i,\beta)$ is defined as a uniform distribution in $\mathbb{R}^3$ with mean $\beta_i$ and width $\delta=0.2$
+Finally, in implementing the logistic regression example, we used two different tuning parameter values for $\epsilon$;  $\epsilon=0.00005$ and $\epsilon=1$. The authors of the paper are not clear on how they chose their $\epsilon$ values. See section 6.3 of @Maire2019. In some parts of the paper it seems like $\epsilon$ is $5\times 10^{4}$, while in other parts it appears that $\epsilon$ is $5 \times 10^{-6}$. So we made this choice because for large values of $\epsilon > 1$ we did not see any change in the acceptance rate of a new proposal $U_{i + 1}$.
+
 
 ```{r "MCMC code", echo=FALSE, cache=TRUE}
 ##Simulated Data
@@ -330,7 +331,14 @@ MRH_MCMC_logistic <- function(sim,y, d, delta){
 
 Finally, we present tables that compare the computational time of using ISS-MCMC. See Table \@ref(tab:tab1).
 
-```{r "computing time", echo=FALSE, cache=TRUE}
+<!-- # ```{r "computing time", echo=FALSE, cache=TRUE} -->
+<!-- # mrhtime <-system.time({MRH_MCMC_logistic(sim,y, d, delta)}) -->
+<!-- # iss_100 <-system.time({ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon, iter)}) -->
+<!-- # iss_500 <-system.time({ISS_MCMC_logistic(sim, y, n=500, d, delta, epsilon, iter)}) -->
+<!-- # iss_1000<-system.time({ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon, iter)}) -->
+<!-- # ``` -->
+
+```{r "new computing time", echo=FALSE}
 mrhtime <-system.time({MRH_MCMC_logistic(sim,y, d, delta)})
 iss_100 <-system.time({ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon, iter)})
 iss_500 <-system.time({ISS_MCMC_logistic(sim, y, n=500, d, delta, epsilon, iter)})
@@ -342,7 +350,7 @@ iss_1000<-system.time({ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon, iter
 library(kableExtra)
 comparison <- rbind(mrhtime, iss_100, iss_500, iss_1000)
 comparison <- as.matrix(comparison[, 3])
-colnames(comparison) <- c("Computational Time (s)")
+colnames(comparison) <- c("System Time (s)")
 rownames(comparison) <- c("MRH", "ISS MCMC (n = 100)",
                           "ISS MCMC (n = 500)",
                           "ISS MCMC (n = 1000)")
@@ -359,14 +367,13 @@ comparison %>%
 
 # Conclusion and Future Work
 
-Since we could not handle simulated data of the order $10^6$, future work can include using a computer with more memory to handle such a large dataset in order to fully reproduce their example and check for any significant gains in reducing computational time. Also future work can include using different tuning parameters $\epsilon$ to investigate the quality the estimates for different choices of $\epsilon$.
+Since we could not handle simulated data of the order $10^6$, future work can include using a computer with more memory to handle such a large dataset in order to fully reproduce their example and check for any significant gains in reducing computational time. Also future work can include using different tuning parameters $\epsilon$ to investigate the quality the estimates for different choices of $\epsilon$ and to clarify what the optimal choices for $\epsilon$ actually are since the authors of the paper are not clear about this. Finally, because in theory we should expect a significant decrease in computational time when using ISS MCMC compared to using MRH, future work could also investigate why for the case of $n = 100$, we do not observe such a reduction. 
 
-\newpage
+
 # Appendix
+Here are marginal distributions and traceplots obtained using the ISS-MCMC algorithm that we used to check for convergence of our MCMC.
 
-Here are marginal distributions and traceplots obtained using the ISS-MCMC algorithm.
-
-```{r "plots", echo=FALSE, cache=TRUE}
+```{r "saving output", echo=FALSE, cache=TRUE}
 r1=MRH_MCMC_logistic(sim,y, d, delta)
 r2=ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon=0.00005, iter)$betas
 r3=ISS_MCMC_logistic(sim, y, n=500, d, delta, epsilon=0.00005, iter)$betas
@@ -379,57 +386,82 @@ r7=ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon=0, iter)$betas
 
 ```{r "plots", echo=FALSE, cache=TRUE}
 #trace plot
-plot(r2[1,],main='trace plot of beta0 in ISS_MCMC method for n=100')
-plot(r2[2,],main='trace plot of beta1 in ISS_MCMC method for n=100')
+plot(r4[1,],main=TeX(r'(trace plot of $\beta_{0}$ in ISS_MCMC method for n=1000)'),
+     type='l', xlab="Iteration",
+     ylab=TeX(r'($\beta_{0}$)'))
+plot(r4[2,],main=TeX(r'(trace plot of $\beta_{1}$ in ISS_MCMC method for n=1000)'),
+     type='l', xlab="Iteration",
+     ylab=TeX(r'($\beta_{1}$)'))
+plot(r4[3,],main=TeX(r'(trace plot of $\beta_{2}$ in ISS_MCMC method for n=1000)'),
+     type='l', xlab="Iteration",
+     ylab=TeX(r'($\beta_{2}$)'))
 
 # for n=100
 #beta0
-plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5),main='Density plots for beta0 when n=100')
+plot(density(r1[1,]),xlab =TeX(r'($\beta_{0}$)'),ylab = 'density',xlim=c(-1.5,-0.5),main=TeX(r'(Density plots for $\beta_{0}$ when n=100)'))
 lines(density(r2[1,]),col='red')
 lines(density(r5[1,]),col='blue')
 legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
        col = c("black", "red", "blue"), lwd = 2)
 
 #beta1
-plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5),main='Density plots for beta1 when n=100')
+plot(density(r1[2,]),xlab = TeX(r'($\beta_{1}$)'),ylab = 'density',xlim=c(0.5,1.5),main=TeX(r'(Density plots for $\beta_{1}$ when n=100)'))
 lines(density(r2[2,]),col='red')
 lines(density(r5[2,]),col='blue')
 legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
        col = c("black", "red", "blue"), lwd = 2)
 
+#beta2
+plot(density(r1[3,]),xlab =TeX(r'($\beta_{2}$)'),ylab = 'density',xlim=c(-0.5,0.5),main=TeX(r'(Density plots for $\beta_{2}$ when n=100)'))
+lines(density(r2[3,]),col='red')
+lines(density(r5[3,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
 
 # for n=500
 #beta0
-plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5),main='Density plots for beta0 when n=500')
+plot(density(r1[1,]),xlab =TeX(r'($\beta_{0}$)'),ylab = 'density',xlim=c(-1.5,-0.5),main=TeX(r'(Density plots for $\beta_{0}$ when n=500)'))
 lines(density(r3[1,]),col='red')
 lines(density(r6[1,]),col='blue')
 legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
        col = c("black", "red", "blue"), lwd = 2)
 
 #beta1
-plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5),main='Density plots for beta1 when n=500')
+plot(density(r1[2,]),xlab = TeX(r'($\beta_{1}$)'),ylab = 'density',xlim=c(0.5,1.5),main=TeX(r'(Density plots for $\beta_{1}$ when n=500)'))
 lines(density(r3[2,]),col='red')
 lines(density(r6[2,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
+
+#beta2
+plot(density(r1[3,]),xlab =TeX(r'($\beta_{2}$)'),ylab = 'density',xlim=c(-0.5,0.5),main=TeX(r'(Density plots for $\beta_{2}$ when n=500)'))
+lines(density(r3[3,]),col='red')
+lines(density(r6[3,]),col='blue')
 legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
        col = c("black", "red", "blue"), lwd = 2)
 
 
 # for n=1000
 #beta0
-plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5),main='Density plots for beta0 when n=1000')
+plot(density(r1[1,]),xlab =TeX(r'($\beta_{0}$)'),ylab = 'density',xlim=c(-1.5,-0.5),main=TeX(r'(Density plots for $\beta_{0}$ when n=1000)'))
 lines(density(r4[1,]),col='red')
 lines(density(r7[1,]),col='blue')
 legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
        col = c("black", "red", "blue"), lwd = 2)
 
 #beta1
-plot(density(r1[2,]),xlab = 'beta1',ylab = 'density',xlim=c(0.5,1.5),main='Density plots for beta1 when n=1000')
+plot(density(r1[2,]),xlab = TeX(r'($\beta_{1}$)'),ylab = 'density',xlim=c(0.5,1.5),main=TeX(r'(Density plots for $\beta_{1}$ when n=1000)'))
 lines(density(r4[2,]),col='red')
 lines(density(r7[2,]),col='blue')
 legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
        col = c("black", "red", "blue"), lwd = 2)
 
-
+#beta2
+plot(density(r1[3,]),xlab =TeX(r'($\beta_{2}$)'),ylab = 'density',xlim=c(-0.5,0.5),main=TeX(r'(Density plots for $\beta_{2}$ when n=1000)'))
+lines(density(r4[3,]),col='red')
+lines(density(r7[3,]),col='blue')
+legend("topright", legend = c("MH", "ISS epsilon=0.00005", "ISS epsilon=0"), 
+       col = c("black", "red", "blue"), lwd = 2)
 ```
 
 
