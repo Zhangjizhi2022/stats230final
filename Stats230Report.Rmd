@@ -117,7 +117,7 @@ For any $\theta \in \Theta$ and $\epsilon \> 0$, there exists $M < \infty$ such 
 ## Setting up the algorithm
 
 
-In the Informed Sub-Sampling method, the set of good subsamples is treated as a series of missing data (denoted by $U_{1}$, $U_{2}$, and so on) and is simulated using the ISS-MCMC algorithm. This algorithm generates a Markov chain on the extended space $\theta \times  \mathcal{U}_{n}$, where $\mathcal{U}_{n}$ is the set of possible sub-samples. The sequence of sub samples is randomly updated in a way that favors those subsets with summary statistics that are similar to the full dataset, as suggested by the analysis in previous sections. The process is implemented using a symmetric transition kernel $R$ on $(\mathcal{U}_n, U_n)$. A transition from $(\theta_i,U_i)$ to $(\theta_{I+1} , U_{i+1})$ involves two steps:
+In the Informed Sub-Sampling method, the set of good subsamples is treated as a series of missing data (denoted by $U_{1}$, $U_{2}$, and so on) and is simulated using the ISS-MCMC algorithm. This algorithm generates a Markov chain on the extended space $\theta \times  \mathcal{U}_{n}$, where $\mathcal{U}_{n}$ is the set of possible sub-samples. The sequence of sub samples is randomly updated in a way that favors those subsets with summary statistics that are similar to the full dataset, as suggested by the analysis in previous sections. The process is implemented using a symmetric transition kernel $R$ on $(\textsf{U}_n, \mathcal{U_n})$. A transition from $(\theta_i,U_i)$ to $(\theta_{I+1} , U_{i+1})$ involves two steps:
 
 (i)
 
@@ -200,6 +200,12 @@ P(Y=1) = \frac{\exp(\beta_0 + \beta_1X_1 + \beta_2X_2)}{1+\exp(\beta_0 + \beta_1
 \end{equation}
 
 We simulate N times with $\beta_0=-1$, $\beta_1=1$ and $\beta_2=0$
+
+We define the prior as a multinormal distribution with mean $\mu=(0,0,0)^T$ and variance $\Sigma=100I$.
+
+The transition kernel of subsets $R(U_i,U)$ is defined as a random sample from the whole set$\textsf{U}$.
+
+The transition kernel of the parameter$Q(\beta_i,\beta)$ is defined as a uniform distribution in $\mathbb{R}^3$ with mean $\beta_i$ and width $\delta=0.2$
 
 ```{r "MCMC code", echo=FALSE, cache=TRUE}
 ##Simulated Data
@@ -367,7 +373,10 @@ r4=ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon=0.00005, iter)$betas
 r5=ISS_MCMC_logistic(sim, y, n=100, d, delta, epsilon=0, iter)$betas
 r6=ISS_MCMC_logistic(sim, y, n=500, d, delta, epsilon=0, iter)$betas
 r7=ISS_MCMC_logistic(sim, y, n=1000, d, delta, epsilon=0, iter)$betas
+```
 
+
+```{r "plots", echo=FALSE, cache=TRUE}
 # for n=100
 #beta0
 plot(density(r1[1,]),xlab = 'beta1',ylab = 'density',xlim=c(-1.5,-0.5))
