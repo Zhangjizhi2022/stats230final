@@ -210,6 +210,7 @@ The transition kernel of the parameter$Q(\beta_i,\beta)$ is defined as a uniform
 ```{r "MCMC code", echo=FALSE, cache=TRUE}
 ##Simulated Data
 library(MASS)
+library(latex2exp)
 set.seed(17)
 mean<-c(1,1)
 sigma<-matrix(c(1,0,0,1),nrow = 2,ncol = 2)
